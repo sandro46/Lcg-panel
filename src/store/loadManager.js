@@ -4,7 +4,7 @@ const config = require('./config.json')
 
 
 const ax = axios.create({
-    baseURL: config.baseURL,
+    baseURL: config.VUE_APP_BASE_URL,
     timeout: 300000,
 });
 

@@ -2,9 +2,8 @@
 const axios = require('axios')
 const config = require('./config.json')
 
-
 const ax = axios.create({
-    baseURL: config.baseURL,
+    baseURL: process.env.VUE_APP_BASE_URL,
     timeout: 100000,
 });
 
