@@ -68,7 +68,8 @@ class Agreements(APIView):
         agreement.arrest_of_property = request.data['agreement']['arrest_of_property']
         agreement.arrest_of_accounts = request.data['agreement']['arrest_of_accounts']
         agreement.arrest_of_deparure = request.data['agreement']['arrest_of_deparure']
-        agreement.process_type = Ref_process_type.objects.get(pk=request.data['agreement']['process_type']) if request.data['agreement']['csi'] else None
+        agreement.process_type = Ref_process_type.objects.get(
+            pk=request.data['agreement']['process_type']) if request.data['agreement']['process_type'] else None
         agreement.save()
         return Response({"payload": "OK"})
     

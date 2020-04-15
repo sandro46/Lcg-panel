@@ -54,6 +54,7 @@ def change_stage(l_id):
                   rejected += 1
                   continue
               a.process_type = Ref_process_type.objects.get(id=row['id стадии'])
+              a.save()
 
        l.status = Ref_load_status.objects.get(pk=2)
        l.items_loaded = loaded
