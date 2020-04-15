@@ -32,7 +32,7 @@ const getters = {
     agreement_list: (state) => (search) => {
       if (search.length == 0)
         return state.items
-      return state.items.filter(i => i.agreement_no == search || i.customer.inn == search || i.id == search)
+      return state.items.filter(i => i.agreement_no == search || i.customer.inn == search || i.id == search || i.customer.f == search )
     },    
     agreement_loading(state){
       return state.loading
@@ -146,6 +146,14 @@ const actions = {
           return true;
         }
     },
+    // async changeProcType({state, commit}, id){
+    //     let agreement = this.getters.agreement_Card(id)
+    //     const res = await ax.put(`/agreement/${id}`, {agreement}).catch(function(err) { console.log(err)});
+    //     // debugger;
+    //     if(!res.err) {
+    //       return true;
+    //     }
+    // },
 }
 
 export default {

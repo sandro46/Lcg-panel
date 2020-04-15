@@ -43,10 +43,13 @@ class Agreements(APIView):
                 obj = Agreement.objects.all().order_by('-id')[:10]
             else:
                 if request.GET['search_by_string']:
-                    customer = Customer.objects.filter(inn=request.GET['search_by_string'])
-                    # print(len(customer))
+                    customer = Customer.objects.filter(
+                        Q(inn=request.GET['search_by_string']) |
+                        Q(f=request.GET['search_by_string'])
+                    )
+                    print('[i] Customer searched result is :', len(customer))
                     if (customer):
-                        obj = Agreement.objects.filter(customer=customer.get()).all().order_by('-id')
+                        obj = Agreement.objects.filter(customer__in=customer).all().order_by('-id')
                     else:
                         obj = Agreement.objects.filter(
                             Q(agreement_no=request.GET['search_by_string']) | 
@@ -65,6 +68,7 @@ class Agreements(APIView):
         agreement.arrest_of_property = request.data['agreement']['arrest_of_property']
         agreement.arrest_of_accounts = request.data['agreement']['arrest_of_accounts']
         agreement.arrest_of_deparure = request.data['agreement']['arrest_of_deparure']
+        agreement.process_type = Ref_process_type.objects.get(pk=request.data['agreement']['process_type']) if request.data['agreement']['csi'] else None
         agreement.save()
         return Response({"payload": "OK"})
     
@@ -141,6 +145,17 @@ class LoaderCtl(APIView):
                 )
                 l.save()
                 res = load_main(l.id)
+                l.refresh_from_db()
+                data = LoaderSerialize(l).data
+                print('[i] Model data is ', data)
+            if(request.data['type'] == '2'):
+                l = Loader(
+                    file_name=f.name, 
+                    type=Ref_load_type.objects.get(pk=request.data['type']), 
+                    status=Ref_load_status.objects.get(pk=1)
+                )
+                l.save()
+                res = change_stage(l.id)
                 l.refresh_from_db()
                 data = LoaderSerialize(l).data
                 print('[i] Model data is ', data)

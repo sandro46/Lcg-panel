@@ -109,6 +109,9 @@ class Agreement(models.Model):
     nadpis_initial_date = models.DateField(null=True)
     nadpis_start_date = models.DateField(null=True)
 
+    formfield_overrides = {
+        models.DateField: {'input_formats': ('%d.%m.%Y',)},
+    }
 
 class Payment(models.Model):
     agreement = models.ForeignKey(Agreement, on_delete=models.CASCADE)

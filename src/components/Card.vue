@@ -115,10 +115,33 @@
               </v-card>
           </v-col>
       </v-row>
+                    <!-- <v-dialog v-model="chngProcdialog" persistent max-width="700px">
+                        <v-card>
+                            <v-card-title>
+                                <span class="headline">{{ chngProcformTitle }}</span>
+                            </v-card-title>
+
+                            <v-card-text>
+                                <v-textarea
+                                    v-model="contact_data.comment"
+                                    outlined
+                                    label="Комментарий"
+                                >
+                                </v-textarea>
+                            </v-card-text>
+
+                            <v-card-actions>
+                                <v-spacer></v-spacer>
+                                <v-btn color="blue darken-1" text @click="chngProcdialog = false">Cancel</v-btn>
+                                <v-btn color="blue darken-1" text @click="save_contact">Save</v-btn>
+                            </v-card-actions>
+                        </v-card>
+                    </v-dialog> -->
       <v-row>
           <v-col>
               <v-card>                
                 <v-simple-table :dense="true">
+
                     <template v-slot:default>
                         <thead>
                             <tr>
@@ -135,6 +158,7 @@
                                         :dense="true"
                                         item-text="name"
                                         item-value="id"
+                                        v-on:change="changeAgreement"
                                     ></v-select>
                                 </td>
                             </tr>
@@ -455,6 +479,8 @@
         data: () => ({
             dialog: false,
             formTitle: "Добавить контакт",
+            chngProcdialog: false,
+            chngProcformTitle: "Коментарий к изменеию стадии",
             contact_load_overlay: false,
             add_phone_style: 'old',       
             // tags: [
@@ -554,6 +580,10 @@
                 if(id == this.$route.params.id) return
                 this.$router.push({ path: `/agreement/${id}` }) // -> /agreement/123
             },
+            // changeProcType(){
+            //     // this.chngProcdialog = true
+            //     await this.$store.dispatch('changeProcType', this.$route.params.id)
+            // },
             async changeAgreement(){
                 await this.$store.dispatch('changeAgreement', this.$route.params.id)
             },

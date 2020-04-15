@@ -15,7 +15,7 @@ class LoaderTypeSeraialiser(serializers.ModelSerializer):
         fields = ['name']
 
 class LoaderSerialize(serializers.ModelSerializer):
-    created = serializers.DateTimeField(format="%Y-%m-%d")
+    created = serializers.DateTimeField(format="%d.%m.%Y")
     # created_at = serializers.DateTimeField(format='%Y')
     # type_name = serializers.PrimaryKeyRelatedField(read_only=True)
     type = LoaderTypeSeraialiser(many=False, read_only=True)
@@ -86,6 +86,7 @@ class AgreementSerialize(serializers.ModelSerializer):
     customer = CustomerSerialize(many=False, read_only=True)
     process_type = RefProcessTypeSerialize(many=False, read_only=True)
     csi = RefCsiSerialize(many=False, read_only=True)
+    # agreement_from = serializers.DateTimeField(format="%d.%m.%Y")
 
     class Meta:
         model = Agreement

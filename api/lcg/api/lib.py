@@ -32,6 +32,38 @@ def create_phone_ifne(*, phone, type, customer: Customer):
        return ph
 
 
+def change_stage(l_id):
+       sheetName = 'реестр'
+       data_xls = pd.read_excel(TMP_DIR+'temp_register.xlsx',
+                             sheetName, index_col=None, header=0, nrows=None)
+       l = Loader.objects.get(pk=l_id)
+       i = 0
+       loaded = 0
+       rejected = 0
+       for index, row in data_xls.iterrows():
+              print('[i] Current row is ', row)
+              if pd.isnull(row['ИНН']) or pd.isnull(row['id стадии']) or pd.isnull(row['Договор']):
+                     rejected+=1
+                     continue
+              c = Customer.objects.filter(inn=row['ИНН']).first()
+              if not c:                     
+                     rejected+=1
+                     continue
+              a = Agreement.objects.filter(agreement_no=row['Договор'], customer=c).first()
+              if not a:
+                  rejected += 1
+                  continue
+              a.process_type = Ref_process_type.objects.get(id=row['id стадии'])
+
+       l.status = Ref_load_status.objects.get(pk=2)
+       l.items_loaded = loaded
+       l.items_rejected = rejected
+       l.save()
+       return {
+           "status": True,
+           "rows_checked": i
+       }
+
 
 def load_main(l_id):
        sheetName = 'реестр'

@@ -50,7 +50,8 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.AllowAny'
     ],
-    'DATETIME_FORMAT': "%Y-%m-%d %H:%M:%S"
+    'DATETIME_FORMAT': "%d.%m.Y% %H:%M:%S",
+    'DATE_FORMAT': "%d.%m.%Y"
 }
 
 
