@@ -1,3 +1,3 @@
 <template>
-    <div> I am dashboard</div>
+    <div> Стартовая страница</div>
 </template>

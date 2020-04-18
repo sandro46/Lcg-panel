@@ -126,7 +126,7 @@ class LoaderCtl(APIView):
     parser_class = (FileUploadParser,)
 
     def get(self, request):
-        obj = Loader.objects.all()
+        obj = Loader.objects.all().order_by('-created')
         serializer = LoaderSerialize(obj, many=True)
         return Response({"payload": serializer.data})
 
@@ -157,6 +157,17 @@ class LoaderCtl(APIView):
                 )
                 l.save()
                 res = change_stage(l.id)
+                l.refresh_from_db()
+                data = LoaderSerialize(l).data
+                print('[i] Model data is ', data)
+            if(request.data['type'] == '3'):
+                l = Loader(
+                    file_name=f.name,
+                    type=Ref_load_type.objects.get(pk=request.data['type']),
+                    status=Ref_load_status.objects.get(pk=1)
+                )
+                l.save()
+                res = add_payments(l.id)
                 l.refresh_from_db()
                 data = LoaderSerialize(l).data
                 print('[i] Model data is ', data)

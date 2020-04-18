@@ -193,7 +193,15 @@
           </v-col>
           <v-col>
                 <v-card>
-                    <v-data-table dense :headers="payment_headers" :items="payments" item-key="name" class="elevation-1">
+                    <v-data-table 
+                        dense 
+                        :headers="payment_headers" 
+                        :items="payments" 
+                        item-key="name" 
+                        class="elevation-1"
+                        :sort-by="['Дата']"
+                        :sort-desc="[false]"
+                    >
                     </v-data-table>
                 </v-card>
           </v-col>
@@ -313,7 +321,7 @@
                                     
                             <v-card-title>
                                 <v-text-field
-                                    label="Search"
+                                    label="Поиск"
                                     single-line
                                     hide-details
                                 ></v-text-field>
@@ -457,8 +465,8 @@
 
                                     <v-card-actions>
                                         <v-spacer></v-spacer>
-                                        <v-btn color="blue darken-1" text @click="close_contact_modal">Cancel</v-btn>
-                                        <v-btn color="blue darken-1" text @click="save_contact">Save</v-btn>
+                                        <v-btn color="blue darken-1" text @click="close_contact_modal">Отмена</v-btn>
+                                        <v-btn color="blue darken-1" text @click="save_contact">Сохранить</v-btn>
                                     </v-card-actions>
                                 </v-card>
                             </v-dialog>

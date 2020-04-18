@@ -39,6 +39,7 @@ const getters = {
     },  
     all_customer_agreements: (state) => (id) => {
       let a = state.items.find(agreement => agreement.id == id)
+      if(!a) return []
       return state.items.filter(agreement => agreement.customer.id == a.customer.id)
     },
     agreement_Card: (state) => (id) => {
