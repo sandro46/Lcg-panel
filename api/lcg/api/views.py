@@ -171,6 +171,18 @@ class LoaderCtl(APIView):
                 l.refresh_from_db()
                 data = LoaderSerialize(l).data
                 print('[i] Model data is ', data)
+            if(request.data['type'] == '4'):
+                l = Loader(
+                    file_name=f.name,
+                    type=Ref_load_type.objects.get(pk=request.data['type']),
+                    status=Ref_load_status.objects.get(pk=1)
+                )
+                l.save()
+                res = change_csi_by_agreement(l.id)
+                l.refresh_from_db()
+                data = LoaderSerialize(l).data
+                print('[i] Model data is ', data)
+                
         return Response({"payload": data})
 
 
