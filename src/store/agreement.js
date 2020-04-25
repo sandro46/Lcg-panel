@@ -65,13 +65,15 @@ const mutations = {
         this.commit("loading", false)
     },
     addAgreement(state, payload){
+      // debugger
       let a = payload[0]
       let i = state.items.findIndex(agreement => agreement.id === a.id)
       if (i > -1) {
-        state.items[i] = a
-      } else {
-        state.items.push(a)
+        state.items.splice(i, 1);
+        // state.items[i] = a
       }
+      state.items.push(a)
+      
     },
     addManyAgreement(state, payload){
       for (let a in payload) {
@@ -139,14 +141,15 @@ const actions = {
           return true;
         }
     },
-    async changeAgreement({state, commit}, id){
-        let agreement = this.getters.agreement_Card(id)
-        const res = await ax.put(`/agreement/${id}`, {agreement}).catch(function(err) { console.log(err)});
-        // debugger;
-        if(!res.err) {
-          return true;
-        }
-    },
+  async changeAgreement({ state, commit }, id){
+    let agreement = this.getters.agreement_Card(id)
+    // debugger
+    const res = await ax.put(`/agreement/${agreement.id}`, {agreement}).catch(function(err) { console.log(err)});
+    if(!res.err) {
+      return true;
+    }
+    return true
+  },
     // async changeProcType({state, commit}, id){
     //     let agreement = this.getters.agreement_Card(id)
     //     const res = await ax.put(`/agreement/${id}`, {agreement}).catch(function(err) { console.log(err)});

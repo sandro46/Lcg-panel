@@ -62,14 +62,28 @@ class Agreements(APIView):
 
     def put(self, request, id):
         print('[i] Agreements request is ', request.data)
+        print('[i] Agreement process_type is ',
+              request.data['agreement']['process_type']
+              )
+
         agreement = Agreement.objects.get(pk=id)
         agreement.csi = Ref_csi.objects.get(pk=request.data['agreement']['csi']['id']) if request.data['agreement']['csi'] else None
         agreement.arrest_of_salary = request.data['agreement']['arrest_of_salary']
         agreement.arrest_of_property = request.data['agreement']['arrest_of_property']
         agreement.arrest_of_accounts = request.data['agreement']['arrest_of_accounts']
         agreement.arrest_of_deparure = request.data['agreement']['arrest_of_deparure']
-        agreement.process_type = Ref_process_type.objects.get(
-            pk=request.data['agreement']['process_type']) if request.data['agreement']['process_type'] else None
+        agreement.give_csi_dt = datetime.strptime(request.data['agreement']['give_csi_dt'], '%d.%m.%Y').strftime('%Y-%m-%d') if request.data['agreement']['give_csi_dt'] else None
+        agreement.recall_csi_dt = datetime.strptime(request.data['agreement']['recall_csi_dt'], '%d.%m.%Y').strftime('%Y-%m-%d') if request.data['agreement']['recall_csi_dt'] else None
+        agreement.stop_actions_csi_dt = datetime.strptime(request.data['agreement']['stop_actions_csi_dt'], '%d.%m.%Y').strftime('%Y-%m-%d') if request.data['agreement']['stop_actions_csi_dt'] else None
+        agreement.return_ispol_doc_dt = datetime.strptime(request.data['agreement']['return_ispol_doc_dt'], '%d.%m.%Y').strftime('%Y-%m-%d') if request.data['agreement']['return_ispol_doc_dt'] else None
+        
+        process_type = None
+        if isinstance(request.data['agreement']['process_type'], int):
+            process_type = process_type = request.data['agreement'].get('process_type', None)  
+        if isinstance(request.data['agreement']['process_type'], dict): 
+            process_type = request.data['agreement']['process_type'].get('id', None)        
+        agreement.process_type = Ref_process_type.objects.get(pk=process_type) if process_type else None
+
         agreement.save()
         return Response({"payload": "OK"})
     
@@ -111,9 +125,9 @@ class Contacts(APIView):
             )
         obj = Contact( 
             agreement = agreement,
-            type=Ref_contact_type.objects.get(pk=request.data['type']), 
-            result=Ref_contact_result.objects.get(pk=request.data['result']),
-            comment=request.data['comment'],
+            type=Ref_contact_type.objects.get(pk=request.data['type']) if request.data['type'] else None, 
+            result=Ref_contact_result.objects.get(pk=request.data['result']) if request.data['result'] else None,
+            comment=request.data['comment'] if request.data['comment'] else None,
             phone = phone,
             installment_amt = request.data['installment_amt'] if request.data['result']==1 and request.data['installment_amt'] else None,
             installment_dt_to = request.data['installment_dt_to'] if request.data['result']==1 and request.data['installment_dt_to'] else None

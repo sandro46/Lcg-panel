@@ -108,6 +108,10 @@ class Agreement(models.Model):
     nadpis_doc_no = models.CharField(max_length=100, null=True)
     nadpis_initial_date = models.DateField(null=True)
     nadpis_start_date = models.DateField(null=True)
+    give_csi_dt = models.DateField(null=True)
+    recall_csi_dt = models.DateField(null=True)
+    stop_actions_csi_dt = models.DateField(null=True)
+    return_ispol_doc_dt = models.DateField(null=True)
 
     formfield_overrides = {
         models.DateField: {'input_formats': ('%d.%m.%Y',)},
@@ -127,8 +131,8 @@ class Ref_contact_result(models.Model):
 class Contact(models.Model):
     agreement = models.ForeignKey(Agreement, on_delete=models.CASCADE)
     phone = models.ForeignKey(Customer_phone, on_delete=models.CASCADE, null=True)
-    type = models.ForeignKey(Ref_contact_type, on_delete=models.CASCADE)
-    result = models.ForeignKey(Ref_contact_result, on_delete=models.CASCADE)
+    type = models.ForeignKey(Ref_contact_type, on_delete=models.CASCADE, null=True)
+    result = models.ForeignKey(Ref_contact_result, on_delete=models.CASCADE, null=True)
     installment_amt = models.FloatField(null=True)
     installment_dt_to = models.DateField(null=True)
     comment = models.TextField(null=True)

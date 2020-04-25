@@ -308,6 +308,56 @@
                                     ></v-switch>
                                 </td>
                             </tr>
+                            <tr>
+                                <td style="height: 70px;">
+                                    <date-picker 
+                                        v-model="agreement.give_csi_dt"
+                                        v-on:change="changeAgreement"   
+                                        :lang="lang" 
+                                        value-type="format" 
+                                        format="DD.MM.YYYY">
+                                    </date-picker>
+                                </td>
+                                <td style="height: 70px;">Дата передачи </td>
+                            </tr>
+                            <tr>
+                                <td style="height: 70px;">
+                                    <date-picker 
+                                        v-model="agreement.recall_csi_dt" 
+                                        v-on:change="changeAgreement" 
+                                        :lang="lang" 
+                                        value-type="format" 
+                                        format="DD.MM.YYYY">
+                                    </date-picker>
+                                </td>
+                                <td style="height: 70px;">Дата отзыва </td>
+                            </tr>
+                            <tr>
+                                <td style="height: 70px;">
+                                    <date-picker 
+                                        v-model="agreement.stop_actions_csi_dt" 
+                                        v-on:change="changeAgreement" 
+                                        :lang="lang" 
+                                        value-type="format" 
+                                        format="DD.MM.YYYY">
+                                    </date-picker>
+                                </td>
+                                <td style="height: 70px;">Дата приостановления действий </td>
+                            
+                            </tr>
+                            <tr>
+                                <td style="height: 70px;">
+                                    <date-picker 
+                                        v-model="agreement.return_ispol_doc_dt" 
+                                        v-on:change="changeAgreement" 
+                                        :lang="lang" 
+                                        value-type="format" 
+                                        format="DD.MM.YYYY">
+                                    </date-picker>
+                                </td>
+                                <td style="height: 70px;">Дата возврата испол. документа</td>
+                            </tr>
+                            
                         </tbody>
                     </v-simple-table>
                 </v-card>
@@ -480,11 +530,22 @@
 </template>
 
 <script>
+    /*eslint-disable */
+    // import moment from 'moment'
+    import DatePicker from 'vue2-datepicker';
+    import 'vue2-datepicker/index.css';
+    
     export default {
+        components: { DatePicker },
         name: 'Card',
 
-
         data: () => ({
+
+            lang: {
+                formatLocale: {
+                    monthsShort: ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июнь', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'],
+                },
+            },
             dialog: false,
             formTitle: "Добавить контакт",
             chngProcdialog: false,
@@ -511,10 +572,15 @@
                 { text: 'Дата', value: 'created' },
                 { text: 'Сумма', value: 'amount' }
             ],
-            date: new Date().toISOString().substr(0, 10),
+            testDate: "2020-04-21",
             menu: false,
             modal: false,
             menu2: false,
+            menu3: false,
+            menu4: false,
+            menu5: false,
+            menu6: false,
+            menu7: false,
         }),
 
         computed: {
@@ -556,7 +622,7 @@
             phone_types(){
                 let o = this.$store.getters.ref_customer_phone_type
                 return o ? o : []
-            }
+            },
         },
         
         created () {
@@ -593,6 +659,7 @@
             //     await this.$store.dispatch('changeProcType', this.$route.params.id)
             // },
             async changeAgreement(){
+                // debugger
                 await this.$store.dispatch('changeAgreement', this.$route.params.id)
             },
             async save_contact(){
