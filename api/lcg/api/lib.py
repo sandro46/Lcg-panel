@@ -101,6 +101,38 @@ def add_payments(l_id):
            "rows_checked": i
        }
 
+def up_finance(l_id):
+       sheetName = 'Sheet1'
+       data_xls = pd.read_excel(TMP_DIR+'temp_register.xlsx',
+                                sheetName, index_col=None, header=0, nrows=None)
+       data_xls['Договор'] = data_xls['Договор'].astype(str)
+       l = Loader.objects.get(pk=l_id)
+       i = 0
+       loaded = 0
+       rejected = 0
+       for index, row in data_xls.iterrows():
+              print('[i] Current row is ', row)
+              if pd.isnull(row['Договор']):
+                     rejected += 1
+                     continue
+              a = Agreement.objects.filter(agreement_no=row['Договор']).first()
+              print('[i] Agreement ', a )
+              a.current_debt = row['текущий долг'] if not pd.isnull(row['текущий долг']) else a.current_debt
+              a.main_debt = row['основной долг'] if not pd.isnull(row['основной долг']) else a.main_debt
+              a.percent = row['проценты'] if not pd.isnull(row['проценты']) else a.percent
+              a.commission = row['комиссия'] if not pd.isnull(row['комиссия']) else a.commission
+              a.penalty = row['пеня'] if not pd.isnull(row['пеня']) else a.penalty
+              a.court_costs = row['судебные издержки (гос./пошлина)'] if not pd.isnull(row['судебные издержки (гос./пошлина)']) else a.court_costs
+              a.save()
+       l.status = Ref_load_status.objects.get(pk=2)
+       l.items_loaded = loaded
+       l.items_rejected = rejected
+       l.save()
+       return {
+           "status": True,
+           "rows_checked": i
+       }
+
 def change_stage(l_id):
        sheetName = 'реестр'
        data_xls = pd.read_excel(TMP_DIR+'temp_register.xlsx',

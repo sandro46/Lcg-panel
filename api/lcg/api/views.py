@@ -152,58 +152,28 @@ class LoaderCtl(APIView):
         with open(TMP_DIR+'temp_register.xlsx', 'wb+') as temp_file:
             for chunk in f.chunks():
                 temp_file.write(chunk)
+            if(request.data['type']):
+                l = Loader(
+                    file_name=f.name,
+                    type=Ref_load_type.objects.get(pk=request.data['type']),
+                    status=Ref_load_status.objects.get(pk=1)
+                )
+                l.save()
+
             if(request.data['type'] == '1'):
-                l = Loader(
-                    file_name=f.name, 
-                    type=Ref_load_type.objects.get(pk=request.data['type']), 
-                    status=Ref_load_status.objects.get(pk=1)
-                )
-                l.save()
                 res = load_main(l.id)
-                l.refresh_from_db()
-                data = LoaderSerialize(l).data
-                print('[i] Model data is ', data)
             if(request.data['type'] == '2'):
-                l = Loader(
-                    file_name=f.name, 
-                    type=Ref_load_type.objects.get(pk=request.data['type']), 
-                    status=Ref_load_status.objects.get(pk=1)
-                )
-                l.save()
                 res = change_stage(l.id)
-                l.refresh_from_db()
-                data = LoaderSerialize(l).data
-                print('[i] Model data is ', data)
             if(request.data['type'] == '3'):
-                l = Loader(
-                    file_name=f.name,
-                    type=Ref_load_type.objects.get(pk=request.data['type']),
-                    status=Ref_load_status.objects.get(pk=1)
-                )
-                l.save()
                 res = add_payments(l.id)
-                l.refresh_from_db()
-                data = LoaderSerialize(l).data
-                print('[i] Model data is ', data)
             if(request.data['type'] == '4'):
-                l = Loader(
-                    file_name=f.name,
-                    type=Ref_load_type.objects.get(pk=request.data['type']),
-                    status=Ref_load_status.objects.get(pk=1)
-                )
-                l.save()
                 res = change_csi_by_agreement(l.id)
-                l.refresh_from_db()
-                data = LoaderSerialize(l).data
-                print('[i] Model data is ', data)
             if(request.data['type'] == '5'):
-                l = Loader(
-                    file_name=f.name,
-                    type=Ref_load_type.objects.get(pk=request.data['type']),
-                    status=Ref_load_status.objects.get(pk=1)
-                )
-                l.save()
                 res = up_court_costs(l.id)
+            if(request.data['type'] == '6'):
+                res = up_finance(l.id)
+            
+            if l:
                 l.refresh_from_db()
                 data = LoaderSerialize(l).data
                 print('[i] Model data is ', data)
