@@ -83,31 +83,31 @@
                         <tbody>    
                             <tr>
                                 <td>Текущая сумма задолженности</td>
-                                <td>{{ agreement.current_debt }}</td>
+                                <td>{{ numFormat.format(agreement.current_debt) }}</td>
                             </tr>
                             <tr>
                                 <td>Основной долг</td>
-                                <td>{{ agreement.main_debt }}</td>
+                                <td>{{ numFormat.format(agreement.main_debt) }}</td>
                             </tr>
                             <tr>
                                 <td>Проценты</td>
-                                <td>{{ agreement.percent }}</td>
+                                <td>{{ numFormat.format(agreement.percent) }}</td>
                             </tr>
                             <tr>
                                 <td>Комиссия</td>
-                                <td>{{ agreement.commission }}</td>
+                                <td>{{ numFormat.format(agreement.commission) }}</td>
                             </tr>
                             <tr>
                                 <td>Пеня</td>
-                                <td>{{ agreement.penalty }}</td>
+                                <td>{{ numFormat.format(agreement.penalty) }}</td>
                             </tr>
                             <tr>
                                 <td>Судебные издержки(гос./пошлина)</td>
-                                <td></td>
+                                <td>{{ numFormat.format(agreement.court_costs) }}</td>
                             </tr>
                             <tr>
                                 <td>Долг на начало</td>
-                                <td>{{ agreement.initial_debt }}</td>
+                                <td>{{ numFormat.format(agreement.initial_debt) }}</td>
                             </tr>
                         </tbody>
                     </template>
@@ -168,7 +168,7 @@
                             </tr>
                             <tr>
                                 <td>Сумма выдачи</td>
-                                <td>{{ agreement.initial_debt }}</td>
+                                <td>{{ numFormat.format(agreement.initial_debt) }}</td>
                             </tr>
                             <tr>
                                 <td>Кем выдан исполнительный документ</td>
@@ -540,7 +540,7 @@
         name: 'Card',
 
         data: () => ({
-
+            numFormat: new Intl.NumberFormat('ru-RU'),
             lang: {
                 formatLocale: {
                     monthsShort: ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июнь', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'],

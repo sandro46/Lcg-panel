@@ -58,6 +58,11 @@
                 
               </v-icon>
           </template>
+
+          <template v-slot:item.main_debt="{ item }">
+            <span>{{ numFormat.format(item.main_debt) }}</span>
+          </template>
+
         </v-data-table>
 
       </v-col>
@@ -74,6 +79,7 @@ export default {
   name: 'Agreement',
 
   data: () => ({
+        numFormat: new Intl.NumberFormat('ru-RU'),
         search: "",
         headers: [
             { text: 'ID', value: 'id', sortable: false },

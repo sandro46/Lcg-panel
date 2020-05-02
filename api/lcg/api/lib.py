@@ -135,6 +135,37 @@ def change_stage(l_id):
        }
 
 
+def up_court_costs(l_id):
+       sheetName = 'Лист1'
+       data_xls = pd.read_excel(TMP_DIR+'temp_register.xlsx', sheetName, index_col=None, header=0,nrows=None )
+       l = Loader.objects.get(pk=l_id)
+
+       i = 0
+       loaded = 0
+       rejected = 0
+       data_xls['Договор'] = data_xls['Договор'].astype(str)
+       for index, row in data_xls.iterrows():
+              # break
+              i += 1
+              print('[i] row["Договор"]=', row['Договор'])
+
+              a = Agreement.objects.filter(agreement_no=row['Договор']).first()
+              if not a:
+                  rejected += 1
+                  continue
+              a.court_costs = row['судебные издержки']
+              a.save()
+
+       l.status = Ref_load_status.objects.get(pk=2)
+       l.items_loaded = loaded
+       l.items_rejected = rejected
+       l.save()
+       return {
+              "status": True,
+              "rows_checked": i
+       }
+
+
 def load_main(l_id):
        sheetName = 'реестр'
        data_xls = pd.read_excel(TMP_DIR+'temp_register.xlsx', sheetName, index_col=None, header=0,nrows=None )

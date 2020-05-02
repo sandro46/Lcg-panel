@@ -88,6 +88,7 @@ class Agreement(models.Model):
     agreement_from = models.DateField(auto_now_add=False)
     current_debt = models.FloatField(default=0)
     main_debt = models.FloatField(default=0)
+    court_costs = models.FloatField(default=0)
     initial_debt = models.FloatField(default=0)
     percent = models.FloatField(default=0)
     commission = models.FloatField(default=0)
@@ -120,6 +121,16 @@ class Agreement(models.Model):
 class Payment(models.Model):
     agreement = models.ForeignKey(Agreement, on_delete=models.CASCADE)
     amount = models.FloatField()
+    start_court_costs = models.FloatField(default=0)
+    start_main_debt = models.FloatField(default=0)
+    start_percent = models.FloatField(default=0)
+    start_commission = models.FloatField(default=0)
+    start_penalty = models.FloatField(default=0)
+    end_court_costs = models.FloatField(default=0)
+    end_main_debt = models.FloatField(default=0)
+    end_percent = models.FloatField(default=0)
+    end_commission = models.FloatField(default=0)
+    end_penalty = models.FloatField(default=0)
     created = models.DateField(auto_now_add=False)
 
 class Ref_contact_type(models.Model):
