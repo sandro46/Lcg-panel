@@ -116,6 +116,9 @@ def up_finance(l_id):
                      rejected += 1
                      continue
               a = Agreement.objects.filter(agreement_no=row['Договор']).first()
+              if not a:
+                  rejected += 1
+                  continue
               print('[i] Agreement ', a )
               a.current_debt = row['текущий долг'] if not pd.isnull(row['текущий долг']) else a.current_debt
               a.main_debt = row['основной долг'] if not pd.isnull(row['основной долг']) else a.main_debt
