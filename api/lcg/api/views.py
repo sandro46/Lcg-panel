@@ -117,7 +117,7 @@ class Contacts(APIView):
         print('[i] Post data is ', request.data)
         agreement = Agreement.objects.get(pk=request.data['agreement_id'])
         phone = None
-        if request.data['new_phone'] and request.data['type'] == 1:
+        if  request.data.get('new_phone') and request.data.get('type') == 1:
             phone = create_phone_ifne(
                 phone=request.data['new_phone'], 
                 type=request.data['new_phone_type'], 

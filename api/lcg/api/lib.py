@@ -2,8 +2,108 @@
 import pandas as pd
 from django.conf import settings
 from api.models import *
+from next_prev import next_in_order, prev_in_order
 
 TMP_DIR = getattr(settings, "TMP_DIR", None)
+
+
+def recalc_all_agrts():
+       agrts = Agreement.objects.all()
+
+       for a in agrts:
+              print(a.id)
+              recalc_debt_strucure(a.id)
+
+def recalc_debt_strucure(agreement_id):
+       a = Agreement.objects.filter(id=agreement_id).first()
+       payments = Payment.objects.filter(agreement=a).order_by('created', 'id')
+       if len(payments) == 0:
+              return
+       i=0
+       for pay in payments:
+              i+=1
+              remains = pay.amount
+              if i == 1:
+                     court_costs = a.court_costs
+                     percent = a.percent
+                     commission = a.commission
+                     penalty = a.penalty
+                     main_debt = a.main_debt
+
+                     start_court_costs = a.court_costs
+                     start_main_debt = a.main_debt
+                     start_percent = a.percent 
+                     start_commission = a.commission
+                     start_penalty = a.penalty
+              else:
+                     last_p = prev_in_order(pay, qs=payments)
+
+                     court_costs = last_p.end_court_costs
+                     percent = last_p.end_percent
+                     commission = last_p.end_commission
+                     penalty = last_p.end_penalty
+                     main_debt = last_p.end_main_debt
+
+                     start_court_costs = last_p.end_court_costs
+                     start_main_debt = last_p.end_main_debt
+                     start_percent = last_p.end_percent
+                     start_commission = last_p.end_commission
+                     start_penalty = last_p.end_penalty
+              if court_costs > 0:
+                     if remains >= court_costs:
+                            remains = remains - court_costs
+                            court_costs = 0
+                     else:
+                            court_costs = court_costs-remains
+                            remains = 0
+              print('[i] remains after costs = ', remains)
+              if remains > 0 and penalty > 0:
+                     if remains >= penalty:
+                            remains = remains - penalty
+                            penalty = 0
+                     else:
+                            penalty = penalty-remains
+                            remains = 0
+              print('[i] remains after penalty = ', remains)
+              if remains > 0 and commission >0:
+                     if remains >= commission:
+                            remains = remains - commission
+                            commission = 0
+                     else:
+                            commission = commission-remains
+                            remains = 0
+              print('[i] remains after commission = ', remains)
+              if remains > 0 and percent > 0:
+                     if remains >= percent:
+                            remains = remains - percent
+                            percent = 0
+                     else:
+                            percent = percent-remains
+                            remains = 0
+              print('[i] remains after percent = ', remains)
+              if remains > 0:
+                     main_debt = main_debt-remains
+
+              pay.start_court_costs=start_court_costs 
+              pay.start_main_debt = start_main_debt
+              pay.start_percent = start_percent
+              pay.start_commission = start_commission
+              pay.start_penalty = start_penalty
+              pay.end_court_costs = court_costs
+              pay.end_main_debt = main_debt
+              pay.end_percent = percent
+              pay.end_commission = commission
+              pay.end_penalty = penalty
+              pay.save()
+              
+              a.court_costs = court_costs
+              a.main_debt = main_debt
+              a.percent = percent
+              a.commission = commission
+              a.penalty = penalty
+              a.current_debt = court_costs+main_debt+percent+commission+penalty
+              a.save()
+       
 
 def create_customer_ifne(*, inn ,f, i, o=None, dr=None, address_reg=None, adr=None, doc_no):
        c = Customer.objects.filter(inn=inn).first()
@@ -80,17 +180,102 @@ def add_payments(l_id):
               if pd.isnull(row['Сумма платежа']) or pd.isnull(row['Договор']):
                      rejected += 1
                      continue
+              row['Сумма платежа'] = float(row['Сумма платежа'])
+              remains = row['Сумма платежа']
               a = Agreement.objects.filter(
                   agreement_no=row['Договор']).first()
               if not a:
                      rejected += 1
                      continue
+              last_p = Payment.objects.filter(agreement=a).order_by('-created', '-id').first()
+              start_court_costs = 0
+              start_main_debt = 0
+              start_percent = 0
+              start_commission = 0
+              start_penalty = 0
+              court_costs = 0
+              main_debt = 0
+              percent = 0
+              commission = 0
+              penalty = 0
+              if not last_p:
+                     court_costs = a.court_costs
+                     percent = a.percent
+                     commission = a.commission
+                     penalty = a.penalty
+                     main_debt = a.main_debt
+
+                     start_court_costs = a.court_costs
+                     start_main_debt = a.main_debt
+                     start_percent = a.percent 
+                     start_commission = a.commission
+                     start_penalty = a.penalty
+              else:
+                     court_costs = last_p.end_court_costs
+                     percent = last_p.end_percent
+                     commission = last_p.end_commission
+                     penalty = last_p.end_penalty
+                     main_debt = last_p.end_main_debt
+
+                     start_court_costs = last_p.end_court_costs
+                     start_main_debt = last_p.end_main_debt
+                     start_percent = last_p.end_percent
+                     start_commission = last_p.end_commission
+                     start_penalty = last_p.end_penalty
+
+              if court_costs>0:
+                     if remains >= court_costs:
+                            remains = remains - court_costs
+                            court_costs=0
+                     else:
+                            court_costs = court_costs-remains
+                            remains = 0
+              print('[i] remains after costs = ', remains)
+              if remains > 0 and penalty>0:
+                     if remains >= penalty:
+                            remains = remains - penalty
+                            penalty=0
+                     else:
+                            penalty = penalty-remains
+                            remains = 0
+              print('[i] remains after penalty = ', remains)
+              if remains > 0 and commission>0:
+                     if remains >= commission:
+                            remains = remains - commission
+                            commission=0
+                     else:
+                            commission = commission-remains
+                            remains = 0
+              print('[i] remains after commission = ', remains)
+              if remains > 0 and percent > 0:
+                     if remains >= percent:
+                         remains = remains - percent
+                         percent = 0
+                     else:
+                            percent = percent-remains
+                            remains = 0
+              print('[i] remains after percent = ', remains)
+              if remains > 0:
+                     main_debt = main_debt-remains
+              
               p = Payment(
                      agreement = a,
                      amount = row['Сумма платежа'],
-                     created = row['Дата платежа']
+                     created = row['Дата платежа'],
+                     start_court_costs=start_court_costs,                    
+                     start_main_debt = start_main_debt,
+                     start_percent = start_percent,
+                     start_commission = start_commission,
+                     start_penalty = start_penalty,
+                     end_court_costs = court_costs,
+                     end_main_debt = main_debt,
+                     end_percent = percent,
+                     end_commission = commission,
+                     end_penalty = penalty
               )
               p.save()
+              a.current_debt = court_costs+main_debt+percent+commission+penalty
+              a.save()
 
        l.status = Ref_load_status.objects.get(pk=2)
        l.items_loaded = loaded
@@ -127,6 +312,8 @@ def up_finance(l_id):
               a.penalty = row['пеня'] if not pd.isnull(row['пеня']) else a.penalty
               a.court_costs = row['судебные издержки (гос./пошлина)'] if not pd.isnull(row['судебные издержки (гос./пошлина)']) else a.court_costs
               a.save()
+
+              recalc_debt_strucure(a.id)
        l.status = Ref_load_status.objects.get(pk=2)
        l.items_loaded = loaded
        l.items_rejected = rejected

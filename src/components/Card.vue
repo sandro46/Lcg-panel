@@ -365,7 +365,19 @@
           <v-col>
                 <v-card>  
                   
-                    <v-data-table dense :headers="contact_headers" :items="contacts" item-key="name" class="elevation-1">
+                    <v-data-table 
+                        dense 
+                        :headers="contact_headers" 
+                        :items="contacts" 
+                        item-key="id" 
+                        :single-expand="singleExpand"
+                        :expanded.sync="expanded"
+                        show-expand
+                        class="elevation-1"
+                    >
+                    <template v-slot:expanded-item="{ headers, item }">
+                        <td :colspan="headers.length">{{ item.comment }}</td>
+                    </template>
                     <template v-slot:top>
                         <v-toolbar flat color="white">
                                     
@@ -522,6 +534,7 @@
                             </v-dialog>
                         </v-toolbar>
                     </template>
+
                     </v-data-table>
                 </v-card>
           </v-col>
@@ -540,6 +553,23 @@
         name: 'Card',
 
         data: () => ({
+            headers: [
+                {
+                    text: 'Dessert (100g serving)',
+                    align: 'start',
+                    sortable: false,
+                    value: 'name',
+                },
+                { text: 'Calories', value: 'calories' },
+                { text: 'Fat (g)', value: 'fat' },
+                { text: 'Carbs (g)', value: 'carbs' },
+                { text: 'Protein (g)', value: 'protein' },
+                { text: 'Iron (%)', value: 'iron.val' },
+                { text: '', value: 'data-table-expand' },
+            ], 
+        
+            singleExpand: true,
+            expanded: [],
             numFormat: new Intl.NumberFormat('ru-RU'),
             lang: {
                 formatLocale: {
@@ -551,22 +581,12 @@
             chngProcdialog: false,
             chngProcformTitle: "Коментарий к изменеию стадии",
             contact_load_overlay: false,
-            add_phone_style: 'old',       
-            // tags: [
-            //     {id: 5115, name: 'Work'},
-            //     {id: 5109, name: 'Home Improvement'},
-            //     {id: 2560, name: 'Vacation'},
-            //     {id: 5106, name: 'Food'},
-            //     {id: 5, name: 'Drawers'},
-            //     {id: 6, name: 'Shopping'},
-            //     {id: 7, name: 'Art'},
-            //     {id: 8, name: 'Tech'},
-            // ],
-            // agreement: {},
+            add_phone_style: 'old',
             contact_headers: [                
                 { text: 'Дата', value: 'created' },
                 { text: 'Тип', value: 'type.name' },
-                { text: 'Рузультат', value: 'result.name' }
+                { text: 'Рузультат', value: 'result.name' },
+                { text: '', value: 'data-table-expand' },
             ],
             payment_headers: [                
                 { text: 'Дата', value: 'created' },

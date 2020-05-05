@@ -92,13 +92,11 @@ const mutations = {
     },
     appendNewContact(state, payload){
       state.contacts.push(payload)
-      state.contactData = {
-        result: false,
-        type: false,
-        comment: '',
-        installment_amt: '',
-        installment_dt_to: ''
-      }
+      state.contactData.result = false
+      state.contactData.type = false
+      state.contactData.comment = ''
+      state.contactData.installment_amt = ''
+      state.contactData.installment_dt_to = ''
     },
     setAgreementPayments(state, payload){
       state.payments = payload
