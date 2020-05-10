@@ -18,6 +18,13 @@ def recalc_debt_strucure(agreement_id):
        a = Agreement.objects.filter(id=agreement_id).first()
        payments = Payment.objects.filter(agreement=a).order_by('created', 'id')
        if len(payments) == 0:
+              a.current_court_costs = a.court_costs
+              a.current_main_debt = a.main_debt
+              a.current_percent = a.percent
+              a.current_commission = a.commission
+              a.current_penalty = a.penalty
+              a.current_debt = a.court_costs+a.main_debt+a.percent+a.commission+a.penalty
+              a.save()
               return
        i=0
        for pay in payments:
@@ -96,11 +103,11 @@ def recalc_debt_strucure(agreement_id):
               pay.end_penalty = penalty
               pay.save()
               
-              a.court_costs = court_costs
-              a.main_debt = main_debt
-              a.percent = percent
-              a.commission = commission
-              a.penalty = penalty
+              a.current_court_costs = court_costs
+              a.current_main_debt = main_debt
+              a.current_percent = percent
+              a.current_commission = commission
+              a.current_penalty = penalty
               a.current_debt = court_costs+main_debt+percent+commission+penalty
               a.save()
        
@@ -377,6 +384,7 @@ def up_court_costs(l_id):
                   continue
               a.court_costs = row['судебные издержки']
               a.save()
+              recalc_debt_strucure(a.id)
 
        l.status = Ref_load_status.objects.get(pk=2)
        l.items_loaded = loaded
@@ -426,13 +434,18 @@ def load_main(l_id):
                      a = Agreement(
                             agreement_no=row['Номер договора'], agreement_from=row['Дата договора'], 
                             current_debt=row['Общая сумма взыскиваемой задолженности'], 
+                            current_main_debt=row['основной долг'],
+                            current_percent=row['проценты'], current_commission=row['комиссия'],
+                            current_penalty=row['пеня'],
                             main_debt=row['основной долг'], initial_debt=row['Сумма выдачи'], 
                             percent=row['проценты'], commission=row['комиссия'], 
-                            penalty=row['пеня'], customer_id=c.id, loader=l,
+                            penalty=row['пеня'],
+                            customer_id=c.id, loader=l,
                             product_type=row['Тип продукта'],
                             process_type = Ref_process_type.objects.get(id=1)
                      )
                      a.save()
+                     recalc_debt_strucure(a.id)
                      loaded += 1
               else:
                      rejected += 1

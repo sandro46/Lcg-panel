@@ -87,23 +87,23 @@
                             </tr>
                             <tr>
                                 <td>Основной долг</td>
-                                <td>{{ numFormat.format(agreement.main_debt) }}</td>
+                                <td>{{ numFormat.format(agreement.current_main_debt) }}</td>
                             </tr>
                             <tr>
                                 <td>Проценты</td>
-                                <td>{{ numFormat.format(agreement.percent) }}</td>
+                                <td>{{ numFormat.format(agreement.current_percent) }}</td>
                             </tr>
                             <tr>
                                 <td>Комиссия</td>
-                                <td>{{ numFormat.format(agreement.commission) }}</td>
+                                <td>{{ numFormat.format(agreement.current_commission) }}</td>
                             </tr>
                             <tr>
                                 <td>Пеня</td>
-                                <td>{{ numFormat.format(agreement.penalty) }}</td>
+                                <td>{{ numFormat.format(agreement.current_penalty) }}</td>
                             </tr>
                             <tr>
                                 <td>Судебные издержки(гос./пошлина)</td>
-                                <td>{{ numFormat.format(agreement.court_costs) }}</td>
+                                <td>{{ numFormat.format(agreement.current_court_costs) }}</td>
                             </tr>
                             <tr>
                                 <td>Долг на начало</td>
