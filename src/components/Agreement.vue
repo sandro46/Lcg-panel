@@ -60,7 +60,7 @@
           </template>
 
           <template v-slot:item.current_debt="{ item }">
-            <span>{{ numFormat.format(item.main_debt) }}</span>
+            <span>{{ numFormat.format(item.current_debt) }}</span>
           </template>
 
         </v-data-table>
