@@ -59,7 +59,7 @@
               </v-icon>
           </template>
 
-          <template v-slot:item.main_debt="{ item }">
+          <template v-slot:item.current_debt="{ item }">
             <span>{{ numFormat.format(item.main_debt) }}</span>
           </template>
 
@@ -88,8 +88,8 @@ export default {
             { text: 'Фамилия', value: 'customer.f' },
             { text: 'Имя', value: 'customer.i' },
             { text: 'Отчество', value: 'customer.o' },
-            { text: 'Основной долг', value: 'main_debt' },
-            {text: 'Actions', value: 'action', sortable: false },
+            { text: 'Основной долг', value: 'current_debt' },
+            { text: 'Actions', value: 'action', sortable: false },
         ],
   }),
   computed: {

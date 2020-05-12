@@ -107,7 +107,15 @@
                             </tr>
                             <tr>
                                 <td>Долг на начало</td>
-                                <td>{{ numFormat.format(agreement.initial_debt) }}</td>
+                                <td>{{ numFormat.format(agreement.main_debt +
+                                                        agreement.court_costs +
+                                                        agreement.percent +
+                                                        agreement.commission +
+                                                        agreement.penalty) }}</td>
+                            </tr>
+                            <tr>
+                                <td>Сумма платежей</td>
+                                <td>{{ numFormat.format(sum_agreement_payments) }}</td>
                             </tr>
                         </tbody>
                     </template>
@@ -202,6 +210,9 @@
                         :sort-by="['Дата']"
                         :sort-desc="[false]"
                     >
+                        <template v-slot:item.amount="{ item }">
+                            <span>{{ numFormat.format(item.amount) }}</span>
+                        </template>
                     </v-data-table>
                 </v-card>
           </v-col>
@@ -615,6 +626,11 @@
             payments() { 
                 let a = this.$store.getters.agreement_payments
                 return  a ? a : {}
+            },
+            sum_agreement_payments() { 
+                debugger
+                let a = this.$store.getters.sum_agreement_payments
+                return  a ? a : 0
             },
             ref_csi(){
                 return this.$store.getters.ref_csi

@@ -53,7 +53,10 @@ const getters = {
     },
     agreement_payments(state) {
       return state.payments
-    }
+    },
+    sum_agreement_payments(state) {
+      return state.payments.reduce((accum, item) => accum + item.amount, 0)
+    },
 }
 
 const mutations = {

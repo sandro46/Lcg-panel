@@ -194,76 +194,6 @@ def add_payments(l_id):
               if not a:
                      rejected += 1
                      continue
-              last_p = Payment.objects.filter(agreement=a).order_by('-created', '-id').first()
-              start_court_costs = 0
-              start_main_debt = 0
-              start_percent = 0
-              start_commission = 0
-              start_penalty = 0
-              court_costs = 0
-              main_debt = 0
-              percent = 0
-              commission = 0
-              penalty = 0
-              if not last_p:
-                     court_costs = a.court_costs
-                     percent = a.percent
-                     commission = a.commission
-                     penalty = a.penalty
-                     main_debt = a.main_debt
-
-                     start_court_costs = a.court_costs
-                     start_main_debt = a.main_debt
-                     start_percent = a.percent 
-                     start_commission = a.commission
-                     start_penalty = a.penalty
-              else:
-                     court_costs = last_p.end_court_costs
-                     percent = last_p.end_percent
-                     commission = last_p.end_commission
-                     penalty = last_p.end_penalty
-                     main_debt = last_p.end_main_debt
-
-                     start_court_costs = last_p.end_court_costs
-                     start_main_debt = last_p.end_main_debt
-                     start_percent = last_p.end_percent
-                     start_commission = last_p.end_commission
-                     start_penalty = last_p.end_penalty
-
-              if court_costs>0:
-                     if remains >= court_costs:
-                            remains = remains - court_costs
-                            court_costs=0
-                     else:
-                            court_costs = court_costs-remains
-                            remains = 0
-              print('[i] remains after costs = ', remains)
-              if remains > 0 and penalty>0:
-                     if remains >= penalty:
-                            remains = remains - penalty
-                            penalty=0
-                     else:
-                            penalty = penalty-remains
-                            remains = 0
-              print('[i] remains after penalty = ', remains)
-              if remains > 0 and commission>0:
-                     if remains >= commission:
-                            remains = remains - commission
-                            commission=0
-                     else:
-                            commission = commission-remains
-                            remains = 0
-              print('[i] remains after commission = ', remains)
-              if remains > 0 and percent > 0:
-                     if remains >= percent:
-                         remains = remains - percent
-                         percent = 0
-                     else:
-                            percent = percent-remains
-                            remains = 0
-              print('[i] remains after percent = ', remains)
-              if remains > 0:
-                     main_debt = main_debt-remains
               
               p = Payment(
                      agreement = a,
@@ -281,8 +211,7 @@ def add_payments(l_id):
                      end_penalty = penalty
               )
               p.save()
-              a.current_debt = court_costs+main_debt+percent+commission+penalty
-              a.save()
+              recalc_debt_strucure(a.id)
 
        l.status = Ref_load_status.objects.get(pk=2)
        l.items_loaded = loaded
