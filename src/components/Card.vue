@@ -389,6 +389,9 @@
                     <template v-slot:expanded-item="{ headers, item }">
                         <td :colspan="headers.length">{{ item.comment }}</td>
                     </template>
+                    <template v-slot:item.installment_amt="{ item }">
+                        <span>{{ numFormat.format(item.installment_amt) }}</span>
+                    </template>
                     <template v-slot:top>
                         <v-toolbar flat color="white">
                                     
