@@ -88,7 +88,7 @@ export default {
             { text: 'Фамилия', value: 'customer.f' },
             { text: 'Имя', value: 'customer.i' },
             { text: 'Отчество', value: 'customer.o' },
-            { text: 'Основной долг', value: 'current_debt' },
+            { text: 'Текущий долг', value: 'current_debt' },
             { text: 'Actions', value: 'action', sortable: false },
         ],
   }),

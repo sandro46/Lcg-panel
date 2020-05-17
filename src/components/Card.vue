@@ -597,6 +597,7 @@
                 { text: 'Дата', value: 'created' },
                 { text: 'Тип', value: 'type.name' },
                 { text: 'Рузультат', value: 'result.name' },
+                { text: 'Отсрочка', value: 'installment_amt' },
                 { text: '', value: 'data-table-expand' },
             ],
             payment_headers: [                
@@ -628,7 +629,6 @@
                 return  a ? a : {}
             },
             sum_agreement_payments() { 
-                debugger
                 let a = this.$store.getters.sum_agreement_payments
                 return  a ? a : 0
             },
