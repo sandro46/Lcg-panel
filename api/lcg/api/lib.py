@@ -142,12 +142,13 @@ def create_phone_ifne(*, phone, type, customer: Customer):
 def change_csi_by_agreement(l_id):
        sheetName = 'Лист1'
        data_xls = pd.read_excel(TMP_DIR+'temp_register.xlsx',
-                                sheetName, index_col=None, header=0, nrows=None)
+                                sheetName, index_col=None, header=0, nrows=None, dtype=str)
        l = Loader.objects.get(pk=l_id)
        i = 0
        loaded = 0
        rejected = 0
        for index, row in data_xls.iterrows():
+              row['Договор']
               print('[i] Current row is ', row)
               if pd.isnull(row['id ЧСИ']) or pd.isnull(row['Договор']):
                      rejected += 1
