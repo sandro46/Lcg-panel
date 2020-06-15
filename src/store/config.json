@@ -1,5 +1,5 @@
 {
   "baseURLProd": "http://95.161.199.126:8081/api/v1/",
   "baseURLProd1": "http://172.27.22.251:8081/api/v1/",
-  "baseURL": "http://172.27.22.251:8081/api/v1/"
+  "baseURL": "http://api.lcg.loc:8081/api/v1/"
 }
