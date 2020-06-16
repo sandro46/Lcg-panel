@@ -117,7 +117,16 @@ def create_customer_ifne(*, inn ,f, i, o=None, dr=None, address_reg=None, adr=No
        
        if not c:
               c = Customer(inn=inn, f=f, i=i, o=o, dr=dr, address_reg=address_reg, doc_no=doc_no)
-              c.save()
+       else:
+              c.inn = inn
+              c.f = f
+              c.i = i
+              c.o = 0
+              c.dr = dr
+              c.address_reg = address_reg
+              c.adr = adr,
+              c.doc_no=doc_no
+       c.save()
        return c
 
 def create_address_ifne(*, addr, type, customer):
@@ -444,11 +453,27 @@ def load_main(l_id):
                             product_type=row['Тип продукта'],
                             process_type = Ref_process_type.objects.get(id=1)
                      )
-                     a.save()
-                     recalc_debt_strucure(a.id)
-                     loaded += 1
               else:
-                     rejected += 1
+                     a.agreement_no=row['Номер договора']
+                     a.agreement_from=row['Дата договора']
+                     a.current_debt=row['Общая сумма взыскиваемой задолженности']
+                     a.current_main_debt=row['основной долг']
+                     a.current_percent=row['проценты']
+                     a.current_commission=row['комиссия']
+                     a.current_penalty=row['пеня']
+                     a.main_debt=row['основной долг']
+                     a.initial_debt=row['Сумма выдачи']
+                     a.percent=row['проценты']
+                     a.commission=row['комиссия']
+                     a.penalty=row['пеня']
+                     a.customer_id=c.id
+                     a.loader=l
+                     a.product_type=row['Тип продукта']
+                     a.process_type = Ref_process_type.objects.get(id=1)
+       
+              a.save()
+              recalc_debt_strucure(a.id)
+              loaded += 1
        l.status = Ref_load_status.objects.get(pk=2)
        l.items_loaded = loaded
        l.items_rejected = rejected

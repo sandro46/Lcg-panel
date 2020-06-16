@@ -58,6 +58,8 @@ class Agreements(APIView):
                     if len(obj) == 0:
                         obj = []
         serializer = AgreementSerialize(obj, many=True)
+        # print(serializer.data)
+        # return Response({"payload": 123})
         return Response({"payload": serializer.data})
 
     def put(self, request, id):
