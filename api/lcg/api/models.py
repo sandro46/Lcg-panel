@@ -137,6 +137,7 @@ class Payment(models.Model):
     end_commission = models.FloatField(null=True)
     end_penalty = models.FloatField(null=True)
     created = models.DateField(auto_now_add=False)
+    load_dt = models.DateField(auto_now_add=True, null=True)
 
 class Ref_contact_type(models.Model):
     name = models.CharField(max_length=100)
