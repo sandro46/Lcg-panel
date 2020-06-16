@@ -197,7 +197,7 @@ def add_payments(l_id):
               if pd.isnull(row['Сумма платежа']) or pd.isnull(row['Договор']):
                      rejected += 1
                      continue
-              row['Сумма платежа'] = float(row['Сумма платежа'])
+              row['Сумма платежа'] = float(row['Сумма платежа'].replace(',', '.'))
               remains = row['Сумма платежа']
               a = Agreement.objects.filter(
                   agreement_no=row['Договор']).first()
@@ -469,7 +469,7 @@ def load_main(l_id):
                      a.customer_id=c.id
                      a.loader=l
                      a.product_type=row['Тип продукта']
-                     a.process_type = Ref_process_type.objects.get(id=1)
+                     a.process_type = Ref_process_type.objects.get(id=10)
        
               a.save()
               recalc_debt_strucure(a.id)
