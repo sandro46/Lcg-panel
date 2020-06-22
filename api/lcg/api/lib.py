@@ -187,7 +187,7 @@ def change_csi_by_agreement(l_id):
 def add_payments(l_id):
        sheetName = 'Sheet1'
        data_xls = pd.read_excel(TMP_DIR+'temp_register.xlsx',
-                                   sheetName, index_col=None, header=0, nrows=None, dtype=str)
+                                   sheetName, index_col=None, header=0, nrows=None)
        l = Loader.objects.get(pk=l_id)
        i = 0
        loaded = 0
@@ -197,6 +197,7 @@ def add_payments(l_id):
               if pd.isnull(row['Сумма платежа']) or pd.isnull(row['Договор']):
                      rejected += 1
                      continue
+              row['Сумма платежа'] = str(row['Сумма платежа'])
               row['Сумма платежа'] = float(row['Сумма платежа'].replace(',', '.'))
               remains = row['Сумма платежа']
               a = Agreement.objects.filter(
