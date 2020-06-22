@@ -187,7 +187,7 @@ def change_csi_by_agreement(l_id):
 def add_payments(l_id):
        sheetName = 'Sheet1'
        data_xls = pd.read_excel(TMP_DIR+'temp_register.xlsx',
-                                   sheetName, index_col=None, header=0, nrows=None)
+                                   sheetName, index_col=None, header=0, nrows=None, dtype=str)
        l = Loader.objects.get(pk=l_id)
        i = 0
        loaded = 0
