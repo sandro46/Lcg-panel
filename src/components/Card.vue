@@ -102,6 +102,10 @@
                                 <td>{{ numFormat.format(agreement.current_penalty) }}</td>
                             </tr>
                             <tr>
+                                <td>Штраф за несоблюдение условий</td>
+                                <td>{{ numFormat.format(agreement.current_penalty_agreement) }}</td>
+                            </tr>
+                            <tr>
                                 <td>Судебные издержки(гос./пошлина)</td>
                                 <td>{{ numFormat.format(agreement.current_court_costs) }}</td>
                             </tr>

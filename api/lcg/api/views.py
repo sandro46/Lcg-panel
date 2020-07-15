@@ -38,6 +38,7 @@ class Agreements(APIView):
             return Response({"payload": serializer.data, "contacts": contacts})
         else:
             print('[i] Get params is ', request.GET )
+            print('[i] Len of request GET is ', len(request.GET) )
 
             if len(request.GET) == 0:
                 obj = Agreement.objects.all().order_by('-id')[:10]
@@ -58,9 +59,9 @@ class Agreements(APIView):
                     if len(obj) == 0:
                         obj = []
         serializer = AgreementSerialize(obj, many=True)
-        # print(serializer.data)
-        # return Response({"payload": 123})
-        return Response({"payload": serializer.data})
+        dt = (serializer.data)
+        return Response({"payload": dt})
+        # return Response({"payload": serializer.data})
 
     def put(self, request, id):
         print('[i] Agreements request is ', request.data)

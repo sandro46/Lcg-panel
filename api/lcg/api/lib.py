@@ -14,7 +14,18 @@ def recalc_all_agrts():
               print(a.id)
               recalc_debt_strucure(a.id)
 
+def decrease_debt(remains, sum):
+       """Вычитает сумму из остатка и возвращает, оба параметра после вычислений"""
+       if remains >= sum:
+              remains = remains - sum
+              sum = 0
+       else:
+              sum = sum-remains
+              remains = 0
+       return remains, sum
+
 def recalc_debt_strucure(agreement_id):
+       """Пересчёт структуры долга после платежа с записью в базу данных"""
        a = Agreement.objects.filter(id=agreement_id).first()
        payments = Payment.objects.filter(agreement=a).order_by('created', 'id')
        if len(payments) == 0:
@@ -23,6 +34,7 @@ def recalc_debt_strucure(agreement_id):
               a.current_percent = a.percent
               a.current_commission = a.commission
               a.current_penalty = a.penalty
+              a.current_penalty_agreement = a.penalty_agreement
               a.current_debt = a.court_costs+a.main_debt+a.percent+a.commission+a.penalty
               a.save()
               return
@@ -49,6 +61,7 @@ def recalc_debt_strucure(agreement_id):
                      percent = last_p.end_percent
                      commission = last_p.end_commission
                      penalty = last_p.end_penalty
+                     penalty_agreement = last_p.end_penalty_agreement
                      main_debt = last_p.end_main_debt
 
                      start_court_costs = last_p.end_court_costs
@@ -56,37 +69,21 @@ def recalc_debt_strucure(agreement_id):
                      start_percent = last_p.end_percent
                      start_commission = last_p.end_commission
                      start_penalty = last_p.end_penalty
+                     start_penalty_agreement = last_p.end_penalty_agreement
               if court_costs > 0:
-                     if remains >= court_costs:
-                            remains = remains - court_costs
-                            court_costs = 0
-                     else:
-                            court_costs = court_costs-remains
-                            remains = 0
+                     remains, court_costs = decrease_debt(remains, court_costs)
               print('[i] remains after costs = ', remains)
               if remains > 0 and penalty > 0:
-                     if remains >= penalty:
-                            remains = remains - penalty
-                            penalty = 0
-                     else:
-                            penalty = penalty-remains
-                            remains = 0
+                     remains, penalty = decrease_debt(remains, penalty)
               print('[i] remains after penalty = ', remains)
+              if remains > 0 and penalty_agreement > 0:
+                     remains, penalty_agreement = decrease_debt(remains, penalty_agreement)
+              print('[i] remains after penalty_agreement = ', remains)
               if remains > 0 and commission >0:
-                     if remains >= commission:
-                            remains = remains - commission
-                            commission = 0
-                     else:
-                            commission = commission-remains
-                            remains = 0
+                     remains, commission = decrease_debt(remains, commission)
               print('[i] remains after commission = ', remains)
               if remains > 0 and percent > 0:
-                     if remains >= percent:
-                            remains = remains - percent
-                            percent = 0
-                     else:
-                            percent = percent-remains
-                            remains = 0
+                     remains, percent = decrease_debt(remains, percent)
               print('[i] remains after percent = ', remains)
               if remains > 0:
                      main_debt = main_debt-remains
@@ -96,11 +93,13 @@ def recalc_debt_strucure(agreement_id):
               pay.start_percent = start_percent
               pay.start_commission = start_commission
               pay.start_penalty = start_penalty
+              pay.start_penalty_agreement = start_penalty_agreement
               pay.end_court_costs = court_costs
               pay.end_main_debt = main_debt
               pay.end_percent = percent
               pay.end_commission = commission
               pay.end_penalty = penalty
+              pay.end_penalty_agreement = penalty_agreement
               pay.save()
               
               a.current_court_costs = court_costs
@@ -108,7 +107,7 @@ def recalc_debt_strucure(agreement_id):
               a.current_percent = percent
               a.current_commission = commission
               a.current_penalty = penalty
-              a.current_debt = court_costs+main_debt+percent+commission+penalty
+              a.current_debt = court_costs+main_debt+percent+commission+penalty+penalty_agreement
               a.save()
        
 
@@ -121,7 +120,7 @@ def create_customer_ifne(*, inn ,f, i, o=None, dr=None, address_reg=None, adr=No
               c.inn = inn
               c.f = f
               c.i = i
-              c.o = 0
+              c.o = o
               c.dr = dr
               c.address_reg = address_reg
               c.adr = adr,
@@ -409,13 +408,14 @@ def up_court_costs(l_id):
 def load_main(l_id):
        sheetName = 'реестр'
        data_xls = pd.read_excel(TMP_DIR+'temp_register.xlsx', sheetName, index_col=None, header=0,nrows=None )
+       # data_xls = data_xls.fillna(0)
        l = Loader.objects.get(pk=l_id)
        
        i = 0
        loaded = 0
        rejected = 0
        for index, row in data_xls.iterrows():
-              # break
+              print(row['Отчество'])
               i += 1
               print('[i] row["ИНН"]=', str(row['ИНН']))
               print('[i] row["Дата рождения"]=', str(row['Дата рождения']))
@@ -440,16 +440,29 @@ def load_main(l_id):
                             agreement_no=row['Номер договора']
                             , agreement_from=row['Дата договора']                      
                      ).first()
+              row['Общая сумма взыскиваемой задолженности'] = row['Общая сумма взыскиваемой задолженности'] if pd.notnull(row['Общая сумма взыскиваемой задолженности']) else 0
+              row['основной долг'] = row['основной долг'] if pd.notnull(row['основной долг'] ) else 0
+              row['пеня'] = row['пеня'] if pd.notnull(row['пеня'] ) else 0
+              row['проценты'] = row['проценты'] if pd.notnull(row['проценты'] ) else 0
+              row['комиссия'] = row['комиссия'] if pd.notnull(row['комиссия'] ) else 0
+              row['Платеж за несоблюдение условий договора'] = row['Платеж за несоблюдение условий договора'] if pd.notnull(row['Платеж за несоблюдение условий договора'] ) else 0
+              row['Сумма выдачи'] = row['Сумма выдачи'] if pd.notnull(row['Сумма выдачи'] ) else 0
               if not a:
                      a = Agreement(
-                            agreement_no=row['Номер договора'], agreement_from=row['Дата договора'], 
-                            current_debt=row['Общая сумма взыскиваемой задолженности'], 
-                            current_main_debt=row['основной долг'],
-                            current_percent=row['проценты'], current_commission=row['комиссия'],
-                            current_penalty=row['пеня'],
-                            main_debt=row['основной долг'], initial_debt=row['Сумма выдачи'], 
-                            percent=row['проценты'], commission=row['комиссия'], 
-                            penalty=row['пеня'],
+                            agreement_no=row['Номер договора'], 
+                            agreement_from=row['Дата договора'], 
+                            current_debt=str(row['Общая сумма взыскиваемой задолженности']).replace(',', '.'), 
+                            current_main_debt=str(row['основной долг'] if pd.notnull(row['основной долг'] ) else 0).replace(',', '.'),
+                            current_percent=str(row['проценты']).replace(',', '.'),
+                            current_commission=str(row['комиссия']).replace(',', '.'),
+                            current_penalty=str(row['пеня']).replace(',', '.'),
+                            current_penalty_agreement=str(row['Платеж за несоблюдение условий договора']).replace(',', '.'),
+                            main_debt=str(row['основной долг']).replace(',', '.'),
+                            initial_debt=str(row['Сумма выдачи']).replace(',', '.'),
+                            percent=str(row['проценты']).replace(',', '.'),
+                            commission=str(row['комиссия']).replace(',', '.'),
+                            penalty=str(row['пеня']).replace(',', '.'),
+                            penalty_agreement=str(row['Платеж за несоблюдение условий договора']).replace(',', '.'),
                             customer_id=c.id, loader=l,
                             product_type=row['Тип продукта'],
                             process_type = Ref_process_type.objects.get(id=1)
@@ -457,16 +470,18 @@ def load_main(l_id):
               else:
                      a.agreement_no=row['Номер договора']
                      a.agreement_from=row['Дата договора']
-                     a.current_debt=row['Общая сумма взыскиваемой задолженности']
-                     a.current_main_debt=row['основной долг']
-                     a.current_percent=row['проценты']
-                     a.current_commission=row['комиссия']
-                     a.current_penalty=row['пеня']
-                     a.main_debt=row['основной долг']
-                     a.initial_debt=row['Сумма выдачи']
-                     a.percent=row['проценты']
-                     a.commission=row['комиссия']
-                     a.penalty=row['пеня']
+                     a.current_debt=str(row['Общая сумма взыскиваемой задолженности']).replace(',', '.')
+                     a.current_main_debt=str(row['основной долг']).replace(',', '.')
+                     a.current_percent=str(row['проценты']).replace(',', '.')
+                     a.current_commission=str(row['комиссия']).replace(',', '.')
+                     a.current_penalty=str(row['пеня']).replace(',', '.')
+                     a.current_penalty_agreement=str(row['Платеж за несоблюдение условий договора']).replace(',', '.')
+                     a.main_debt=str(row['основной долг']).replace(',', '.')
+                     a.initial_debt=str(row['Сумма выдачи']).replace(',', '.')
+                     a.percent=str(row['проценты']).replace(',', '.')
+                     a.commission=str(row['комиссия']).replace(',', '.')
+                     a.penalty=str(row['пеня']).replace(',', '.')
+                     a.penalty_agreement=str(row['Платеж за несоблюдение условий договора']).replace(',', '.')
                      a.customer_id=c.id
                      a.loader=l
                      a.product_type=row['Тип продукта']
