@@ -48,12 +48,14 @@ def recalc_debt_strucure(agreement_id):
                      commission = a.commission
                      penalty = a.penalty
                      main_debt = a.main_debt
+                     penalty_agreement = a.penalty_agreement
 
                      start_court_costs = a.court_costs
                      start_main_debt = a.main_debt
                      start_percent = a.percent 
                      start_commission = a.commission
                      start_penalty = a.penalty
+                     start_penalty_agreement = a.penalty_agreement
               else:
                      last_p = prev_in_order(pay, qs=payments)
 
@@ -415,7 +417,7 @@ def load_main(l_id):
        loaded = 0
        rejected = 0
        for index, row in data_xls.iterrows():
-              print(row['Отчество'])
+              # print(row['Отчество'])
               i += 1
               print('[i] row["ИНН"]=', str(row['ИНН']))
               print('[i] row["Дата рождения"]=', str(row['Дата рождения']))
