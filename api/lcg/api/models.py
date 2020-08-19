@@ -77,6 +77,7 @@ class Ref_csi(models.Model):
 
 class Contragent(models.Model):
     name = models.CharField(max_length=100)
+    type_info = models.CharField(max_length=100, null=True)
     
 class Ref_process_type(models.Model):
     name = models.CharField(max_length=100)
@@ -103,6 +104,7 @@ class Agreement(models.Model):
     product_type = models.CharField(max_length=255, null=True)
     customer = models.ForeignKey(Customer, related_name="fk_agreement_customer_id", on_delete=models.CASCADE)
     loader = models.ForeignKey(Loader, on_delete=models.CASCADE)
+    contragent = models.ForeignKey(Contragent, related_name="fk_agreement_contragent_id", on_delete=models.CASCADE, null=True)
     process_type = models.ForeignKey(Ref_process_type, on_delete=models.CASCADE)
     csi = models.ForeignKey(Ref_csi, on_delete=models.CASCADE, null=True)
     ispol_date = models.DateField(null=True)

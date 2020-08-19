@@ -56,7 +56,7 @@
                                 </tr>
                                 <tr>
                                     <td>Контрагент</td>
-                                    <td>CCG</td>
+                                    <td>{{agreement.contragent.name}}</td>
                                 </tr>
                                 <tr>
                                     <td>Номер договора</td>

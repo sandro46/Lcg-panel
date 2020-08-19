@@ -81,11 +81,18 @@ class PaymentSerialize(serializers.ModelSerializer):
         model = Payment
         fields = '__all__'
 
+class ContragentSerialize(serializers.ModelSerializer):
+    
+    class Meta:
+        model = Contragent
+        fields = '__all__'
+
 
 class AgreementSerialize(serializers.ModelSerializer):
     customer = CustomerSerialize(many=False, read_only=True)
     process_type = RefProcessTypeSerialize(many=False, read_only=True)
     csi = RefCsiSerialize(many=False, read_only=True)
+    contragent = ContragentSerialize(many=False, read_only=True)
     # agreement_from = serializers.DateTimeField(format="%d.%m.%Y")
 
     class Meta:

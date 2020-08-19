@@ -438,10 +438,21 @@ def load_main(l_id):
               print('[i] row["Номер договора"]=', str(row['Номер договора']))
               print('[i] row["Дата договора"]=', str(row['Дата договора']))
               print('[i] row["Тип продукта"]=', str(row['Тип продукта']))
+              print('[i] row["ID Контрагента"]=', int(str(row['ID Контрагента']).replace(',', '.')) )
+              process_type = Ref_process_type.objects.get(id=1)
+
+              # return {
+              #        "status": True,
+              #        "rows_checked": 20
+              # }
+              
               a = Agreement.objects.filter(
-                            agreement_no=row['Номер договора']
-                            , agreement_from=row['Дата договора']                      
-                     ).first()
+                     agreement_no=row['Номер договора']
+                     , agreement_from=row['Дата договора']                      
+              ).first()
+              contr = Contragent.objects.filter(id=int(str(row['ID Контрагента']).replace(',', '.'))).first()
+              print(row['ID Контрагента'], contr.id, l, process_type)
+
               row['Общая сумма взыскиваемой задолженности'] = row['Общая сумма взыскиваемой задолженности'] if pd.notnull(row['Общая сумма взыскиваемой задолженности']) else 0
               row['основной долг'] = row['основной долг'] if pd.notnull(row['основной долг'] ) else 0
               row['пеня'] = row['пеня'] if pd.notnull(row['пеня'] ) else 0
@@ -464,10 +475,11 @@ def load_main(l_id):
                             percent=str(row['проценты']).replace(',', '.'),
                             commission=str(row['комиссия']).replace(',', '.'),
                             penalty=str(row['пеня']).replace(',', '.'),
+                            contragent=contr,
                             penalty_agreement=str(row['Платеж за несоблюдение условий договора']).replace(',', '.'),
                             customer_id=c.id, loader=l,
                             product_type=row['Тип продукта'],
-                            process_type = Ref_process_type.objects.get(id=1)
+                            process_type = process_type
                      )
               else:
                      a.agreement_no=row['Номер договора']
@@ -482,12 +494,13 @@ def load_main(l_id):
                      a.initial_debt=str(row['Сумма выдачи']).replace(',', '.')
                      a.percent=str(row['проценты']).replace(',', '.')
                      a.commission=str(row['комиссия']).replace(',', '.')
-                     a.penalty=str(row['пеня']).replace(',', '.')
+                     a.penalty = str(row['пеня']).replace(',', '.')
+                     a.customer = c
+                     a.contragent = contr
                      a.penalty_agreement=str(row['Платеж за несоблюдение условий договора']).replace(',', '.')
-                     a.customer_id=c.id
                      a.loader=l
                      a.product_type=row['Тип продукта']
-                     a.process_type = Ref_process_type.objects.get(id=10)
+                     a.process_type = process_type
        
               a.save()
               recalc_debt_strucure(a.id)
