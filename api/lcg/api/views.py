@@ -31,11 +31,17 @@ class Agreements(APIView):
             obj = Agreement.objects.filter(customer=a.customer).all().order_by('-id')
             serializer = AgreementSerialize(obj, many=True)
             c = Contact.objects.filter(agreement=obj[0]).all().order_by('-id')
+            csi_actions_d = Csi_actions.objects.filter(agreement=obj[0]).all().order_by('-id')
             print('[i] Contact object is ', c)
             # return Response({"payload": 'ok'})
+
             contacts = ContactSerilize(c, many=True) if len(c)>0 else []
             contacts = contacts.data if len(c)>0 else []
-            return Response({"payload": serializer.data, "contacts": contacts})
+
+            csi_actions = CsiActionSerialize(csi_actions_d, many=True) if len(csi_actions_d)>0 else []
+            csi_actions = csi_actions.data if len(csi_actions_d) > 0 else []
+
+            return Response({"payload": serializer.data, "contacts": contacts, "csi_actions": csi_actions})
         else:
             print('[i] Get params is ', request.GET )
             print('[i] Len of request GET is ', len(request.GET) )
@@ -138,6 +144,61 @@ class Contacts(APIView):
         obj.save()
         serializer = ContactSerilize(obj)
         return Response({"payload": serializer.data})
+
+class CsiActions(APIView):
+
+    def post(self, request):
+        print('[i][CsiActions] post data is ', request.data)
+
+        obj = Csi_actions(
+            agreement=Agreement.objects.get(pk=request.data['agreement_id']),
+            csi=Ref_csi.objects.get(pk=request.data['csi']['id']),
+
+            arrest_of_salary = request.data['arrest_of_salary'],
+            arrest_of_property =request.data['arrest_of_property'],
+            arrest_of_accounts =request.data['arrest_of_accounts'],
+            arrest_of_deparure =request.data['arrest_of_deparure'],
+
+            give_csi_dt = datetime.strptime(request.data['give_csi_dt'], '%d.%m.%Y').strftime('%Y-%m-%d') if request.data['give_csi_dt'] else None,
+            recall_csi_dt = datetime.strptime(request.data['recall_csi_dt'], '%d.%m.%Y').strftime('%Y-%m-%d') if request.data['recall_csi_dt'] else None,
+            stop_actions_csi_dt = datetime.strptime(request.data['stop_actions_csi_dt'], '%d.%m.%Y').strftime('%Y-%m-%d') if request.data['stop_actions_csi_dt'] else None,
+            return_ispol_doc_dt = datetime.strptime(request.data['return_ispol_doc_dt'], '%d.%m.%Y').strftime('%Y-%m-%d') if request.data['return_ispol_doc_dt'] else None,
+            
+            comment=request.data['comment'] if request.data['comment'] else None,
+        )
+        obj.save()
+        obj = Csi_actions.objects.get(pk=obj.id)
+        serializer = CsiActionSerialize(obj)
+        return Response({"payload": serializer.data})
+    
+    def put(self, request):
+        print('[i][CsiActions] put data is ', request.data)
+
+        obj = Csi_actions.objects.get(pk=request.data['id'])
+
+        obj.agreement = Agreement.objects.get(pk=request.data['agreement'])
+        obj.csi = Ref_csi.objects.get(pk=request.data['csi']['id'])
+
+        obj.arrest_of_salary = request.data['arrest_of_salary']
+        obj.arrest_of_property =request.data['arrest_of_property']
+        obj.arrest_of_accounts =request.data['arrest_of_accounts']
+        obj.arrest_of_deparure =request.data['arrest_of_deparure']
+
+        obj.give_csi_dt = datetime.strptime(request.data['give_csi_dt'], '%d.%m.%Y').strftime('%Y-%m-%d') if request.data['give_csi_dt'] else None
+        obj.recall_csi_dt = datetime.strptime(request.data['recall_csi_dt'], '%d.%m.%Y').strftime('%Y-%m-%d') if request.data['recall_csi_dt'] else None
+        obj.stop_actions_csi_dt = datetime.strptime(request.data['stop_actions_csi_dt'], '%d.%m.%Y').strftime('%Y-%m-%d') if request.data['stop_actions_csi_dt'] else None
+        obj.return_ispol_doc_dt = datetime.strptime(request.data['return_ispol_doc_dt'], '%d.%m.%Y').strftime('%Y-%m-%d') if request.data['return_ispol_doc_dt'] else None
+
+        obj.comment = request.data['comment'] if request.data['comment'] else None
+
+        obj.save()
+        serializer = CsiActionSerialize(obj)
+        return Response({"payload": serializer.data})
+
+    def delete(self, request, id):
+        print('[i][CsiActions] delete data is ', request.data)
+        Csi_actions.objects.filter(id=id).delete()
+        return Response({"payload": 'OK'})
 
 class LoaderCtl(APIView):
     parser_class = (FileUploadParser,)

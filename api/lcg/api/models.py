@@ -82,6 +82,7 @@ class Contragent(models.Model):
 class Ref_process_type(models.Model):
     name = models.CharField(max_length=100)
 
+
 class Agreement(models.Model):
     
     # template = models.ForeignKey(Template, verbose_name="template_link", related_name="fk_template_task", on_delete=models.CASCADE)
@@ -127,6 +128,32 @@ class Agreement(models.Model):
         models.DateField: {'input_formats': ('%d.%m.%Y',)},
     }
 
+
+class Csi_actions(models.Model):
+    """Исторя действий ЧСИ"""
+
+    csi = models.ForeignKey(Ref_csi, on_delete=models.CASCADE)
+    agreement = models.ForeignKey(Agreement, on_delete=models.CASCADE)
+
+    arrest_of_salary = models.CharField(max_length=1, default='N')    
+    arrest_of_property = models.CharField(max_length=1, default='N')
+    arrest_of_accounts = models.CharField(max_length=1, default='N')
+    arrest_of_deparure = models.CharField(max_length=1, default='N')
+
+    give_csi_dt = models.DateField(null=True)
+    recall_csi_dt = models.DateField(null=True)
+    stop_actions_csi_dt = models.DateField(null=True)
+    return_ispol_doc_dt = models.DateField(null=True)
+    
+    comment = models.TextField(null=True)
+
+    created = models.DateField(auto_now_add=True)
+    
+    formfield_overrides = {
+        models.DateField: {'input_formats': ('%d.%m.%Y',)},
+    }
+
+    
 class Payment(models.Model):
     agreement = models.ForeignKey(Agreement, on_delete=models.CASCADE)
     amount = models.FloatField()

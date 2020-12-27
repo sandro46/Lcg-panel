@@ -56,7 +56,7 @@
                                 </tr>
                                 <tr>
                                     <td>Контрагент</td>
-                                    <td>{{agreement.contragent.name}}</td>
+                                    <td>{{agreement.contragent ? agreement.contragent['name'] : ''}}</td>
                                 </tr>
                                 <tr>
                                     <td>Номер договора</td>
@@ -205,6 +205,9 @@
           </v-col>
           <v-col>
                 <v-card>
+                    <v-card-title>
+                        Платежи
+                    </v-card-title>
                     <v-data-table 
                         dense 
                         :headers="payment_headers" 
@@ -223,159 +226,53 @@
       </v-row>
       <v-row>
           <v-col>
-                <v-card>
-                    
-                    <v-simple-table :dense="true">
-                        <thead>
-                            <tr>
-                                <th class="text-left" colspan=2 >Информация о ЧСИ</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>ФИО</td>
-                                <td>        
-                                    <template>           
-                                        <v-select
-                                            :items="ref_csi"
-                                            item-text="name"
-                                            item-value="id"
-                                            v-model="agreement.csi"
-                                            dense
-                                            label=""
-                                            v-on:change="changeAgreement"
-                                            return-object
-                                        >
-                                            <template slot='selection' slot-scope='{ item }'>
-                                                {{ item.region.name }} ({{ item.fio }})
-                                            </template>
-                                            <template slot='item' slot-scope='{ item }'>
-                                                {{ item.region.name }} ({{ item.fio }})
-                                            </template>
-                                        </v-select>
-                                    </template>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Телефон</td>
-                                <td>{{ agreement.csi ? agreement.csi.phone  : '-' }}</td>
-                            </tr>
-                            <tr>
-                                <td>Номер лицензии</td>
-                                <td>{{ agreement.csi ? agreement.csi.no  : '-' }}</td>
-                            </tr>
-                            <tr>
-                                <td>Регион</td>
-                                <td>{{ agreement.csi ? agreement.csi.region.name  : '-' }}</td>
-                            </tr>
-                        </tbody>
-                        <thead>
-                            <tr>
-                                <th class="text-left" colspan=2 >Действия ЧСИ</th>
-                            </tr>
-                        </thead>                      
-                        <tbody>
-                            <tr>
-                                <td colspan=2>
-                                    <v-switch
-                                        v-model="agreement.arrest_of_salary"
-                                        true-value='Y'
-                                        false-value='N'
-                                        label="Арест ЗП"
-                                        v-on:change="changeAgreement"
-                                        dense
-                                    ></v-switch>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td colspan=2 align='center'>
-                                    <v-switch
-                                        v-model="agreement.arrest_of_property"
-                                        true-value='Y'
-                                        false-value='N'
-                                        label="Арест имущества"
-                                        v-on:change="changeAgreement"
-                                        dense
-                                    ></v-switch>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td colspan=2>
-                                    <v-switch
-                                        v-model="agreement.arrest_of_accounts"
-                                        true-value='Y'
-                                        false-value='N'
-                                        label="Арест счетов"
-                                        v-on:change="changeAgreement"
-                                        dense
-                                    ></v-switch>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td colspan=2>
-                                    <v-switch
-                                        v-model="agreement.arrest_of_deparure"
-                                        true-value='Y'
-                                        false-value='N'
-                                        label="Запрет на выезд"
-                                        v-on:change="changeAgreement"
-                                        dense
-                                    ></v-switch>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td style="height: 70px;">
-                                    <date-picker 
-                                        v-model="agreement.give_csi_dt"
-                                        v-on:change="changeAgreement"   
-                                        :lang="lang" 
-                                        value-type="format" 
-                                        format="DD.MM.YYYY">
-                                    </date-picker>
-                                </td>
-                                <td style="height: 70px;">Дата передачи </td>
-                            </tr>
-                            <tr>
-                                <td style="height: 70px;">
-                                    <date-picker 
-                                        v-model="agreement.recall_csi_dt" 
-                                        v-on:change="changeAgreement" 
-                                        :lang="lang" 
-                                        value-type="format" 
-                                        format="DD.MM.YYYY">
-                                    </date-picker>
-                                </td>
-                                <td style="height: 70px;">Дата отзыва </td>
-                            </tr>
-                            <tr>
-                                <td style="height: 70px;">
-                                    <date-picker 
-                                        v-model="agreement.stop_actions_csi_dt" 
-                                        v-on:change="changeAgreement" 
-                                        :lang="lang" 
-                                        value-type="format" 
-                                        format="DD.MM.YYYY">
-                                    </date-picker>
-                                </td>
-                                <td style="height: 70px;">Дата приостановления действий </td>
-                            
-                            </tr>
-                            <tr>
-                                <td style="height: 70px;">
-                                    <date-picker 
-                                        v-model="agreement.return_ispol_doc_dt" 
-                                        v-on:change="changeAgreement" 
-                                        :lang="lang" 
-                                        value-type="format" 
-                                        format="DD.MM.YYYY">
-                                    </date-picker>
-                                </td>
-                                <td style="height: 70px;">Дата возврата испол. документа</td>
-                            </tr>
-                            
-                        </tbody>
-                    </v-simple-table>
-                </v-card>
+            <v-card>
+                <v-data-table 
+                    dense 
+                    :headers="csi_action_headers" 
+                    :items="csi_actions" 
+                    item-key="id" 
+                    class="elevation-1"
+                >
+
+                    <template v-slot:top>
+                        <v-toolbar flat color="white">
+                            <v-card-title>
+                                История действий ЧСИ
+                            </v-card-title>     
+                            <v-spacer></v-spacer>
+                            <v-spacer></v-spacer> 
+                            <!-- Модалка для добавления действий ЧСИ -->
+                            <Csi_action_modal 
+                                :csi_action_data=csi_action_data
+                                :ref_csi=ref_csi
+                                :lang=lang
+                                :mode='"addItem"'
+                            >
+                            </Csi_action_modal>
+                        </v-toolbar>   
+                    </template>
+
+                    <template v-slot:item.actions="{ item }">
+                       
+                        <!-- Модалка для добавления действий ЧСИ -->
+                        <Csi_action_modal 
+                            :csi_action_data=item
+                            :ref_csi=ref_csi
+                            :lang=lang
+                            :mode='"editItem"'
+                        >
+                        </Csi_action_modal>
+                        <v-icon
+                        small
+                        @click="deleteCsiAction(item)"
+                        >
+                        mdi-delete
+                        </v-icon>
+                    </template>
+
+                </v-data-table>
+            </v-card>
           </v-col>
           <v-col>
                 <v-card>  
@@ -398,7 +295,10 @@
                     </template>
                     <template v-slot:top>
                         <v-toolbar flat color="white">
-                                    
+                            <v-card-title>
+                                История контактов
+                            </v-card-title>     
+                            <v-spacer></v-spacer> 
                             <v-card-title>
                                 <v-text-field
                                     label="Поиск"
@@ -407,7 +307,7 @@
                                 ></v-text-field>
                             </v-card-title> 
                             <v-spacer></v-spacer>
-                            <v-dialog v-model="dialog" persistent max-width="700px">
+                            <v-dialog v-model="contact_dialog" persistent max-width="700px">
                                 <template v-slot:activator="{ on }">
                                     <v-btn color="primary" dark class="mb-2" v-on="on">
                                         <v-icon>mdi-plus</v-icon>
@@ -565,9 +465,10 @@
     // import moment from 'moment'
     import DatePicker from 'vue2-datepicker';
     import 'vue2-datepicker/index.css';
+    import Csi_action_modal from './Csi_action_modal';
     
     export default {
-        components: { DatePicker },
+        components: { DatePicker, Csi_action_modal },
         name: 'Card',
 
         data: () => ({
@@ -583,18 +484,20 @@
                 { text: 'Carbs (g)', value: 'carbs' },
                 { text: 'Protein (g)', value: 'protein' },
                 { text: 'Iron (%)', value: 'iron.val' },
-                { text: '', value: 'data-table-expand' },
+                { text: 'Actions', value: 'actions', sortable: false },
             ], 
         
             singleExpand: true,
             expanded: [],
+            singleExpand1: true,
+            expanded1: [],
             numFormat: new Intl.NumberFormat('ru-RU'),
             lang: {
                 formatLocale: {
                     monthsShort: ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июнь', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'],
                 },
             },
-            dialog: false,
+            contact_dialog: false,
             formTitle: "Добавить контакт",
             chngProcdialog: false,
             chngProcformTitle: "Коментарий к изменеию стадии",
@@ -606,6 +509,11 @@
                 { text: 'Рузультат', value: 'result.name' },
                 { text: 'Отсрочка', value: 'installment_amt' },
                 { text: '', value: 'data-table-expand' },
+            ],
+            csi_action_headers: [                
+                { text: 'ЧСИ', value: 'csi.fio' },
+                { text: 'Дата', value: 'created' },
+                { text: 'Actions', value: 'actions', sortable: false },
             ],
             payment_headers: [                
                 { text: 'Дата', value: 'created' },
@@ -648,6 +556,9 @@
             contacts(){
                 return this.$store.getters.contacts
             },
+            csi_actions(){
+                return this.$store.getters.csi_actions
+            },
             contact_type(){
                 return this.$store.getters.ref_contact_type
             },
@@ -656,6 +567,10 @@
             },
             contact_data(){
                 let o = this.$store.getters.contactData
+                return o ? o : {}
+            },
+            csi_action_data(){
+                let o = this.$store.getters.csiActionData
                 return o ? o : {}
             },
             customer_phones(){
@@ -678,8 +593,12 @@
         },
 
         methods: {
+            async deleteCsiAction(item){
+                if(!window.confirm('Удалить элемент?')) return
+                await this.$store.dispatch('deleteCsiAction', item.id)
+            },
             close_contact_modal(){
-                this.dialog = false
+                this.contact_dialog = false
                 this.contact_load_overlay = false
             },
             fetchData(){
@@ -690,6 +609,7 @@
                 this.$store.dispatch('loadCustomerPhoneTypes')
                 this.$store.dispatch('loadRefCsi')
                 this.$store.commit('setContactAgreement', this.$route.params.id)
+                this.$store.commit('setCsiActionAgreement', this.$route.params.id)
                 this.$store.dispatch('loadContactResults')
                 this.$store.dispatch('loadCustomerPhonesByAgreement', this.$route.params.id)
             },

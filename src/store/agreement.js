@@ -23,7 +23,21 @@ const state = {
       installment_amt: '',
       installment_dt_to: ''
     },
+    csi_action_data:{
+      agreement_id: null,
+      csi: {},
+      arrest_of_salary: 'N',
+      arrest_of_property: 'N',
+      arrest_of_accounts: 'N',
+      arrest_of_deparure: 'N',
+      give_csi_dt: '',
+      recall_csi_dt: '',
+      stop_actions_csi_dt: '',
+      return_ispol_doc_dt: '',
+      comment: ''
+    },
     payments: [],
+    csi_actions: [],
     csi: {},
     loading: true
 }
@@ -48,8 +62,14 @@ const getters = {
     contactData(state) {
       return state.contactData
     },
+    csiActionData(state) {
+      return state.csi_action_data
+    },
     contacts(state) {
       return state.contacts
+    },
+    csi_actions(state) {
+      return state.csi_actions
     },
     agreement_payments(state) {
       return state.payments
@@ -89,9 +109,15 @@ const mutations = {
     setContactAgreement(state, id){
       state.contactData.agreement_id = id
     },
+    setCsiActionAgreement(state, id){
+      state.csi_action_data.agreement_id = id
+    },
     setContacts(state, payload){
-      // debugger
       state.contacts = payload
+    },
+    setCsiActions(state, payload){
+      // debugger
+      state.csi_actions = payload
     },
     appendNewContact(state, payload){
       state.contacts.push(payload)
@@ -100,6 +126,32 @@ const mutations = {
       state.contactData.comment = ''
       state.contactData.installment_amt = ''
       state.contactData.installment_dt_to = ''
+    },
+    appendNewCsiAction(state, payload){
+      state.csi_actions.push(payload)
+
+      state.csi_action_data.csi = {}
+      state.csi_action_data.arrest_of_salary = 'N'
+      state.csi_action_data.arrest_of_property = 'N'
+      state.csi_action_data.arrest_of_accounts = 'N'
+      state.csi_action_data.arrest_of_deparure = 'N'
+      state.csi_action_data.give_csi_dt = ''
+      state.csi_action_data.recall_csi_dt = ''
+      state.csi_action_data.stop_actions_csi_dt = ''
+      state.csi_action_data.return_ispol_doc_dt = ''
+      state.csi_action_data.comment = ''
+    },
+    editCsiAction(state, payload){
+      let idx = state.csi_actions.findIndex((i, e) => {
+        return e.id == payload.id
+      })
+      state.csi_actions[idx] = payload
+    },
+    deleteCsiAction(state, id){
+      let idx = state.csi_actions.findIndex((i, e) => {
+        return e.id == id
+      })
+      state.csi_actions.splice(idx, 1)
     },
     setAgreementPayments(state, payload){
       state.payments = payload
@@ -124,6 +176,7 @@ const actions = {
         if(!res.err) {
           commit('addAgreement', res.data.payload)
           commit('setContacts', res.data.contacts)
+          commit('setCsiActions', res.data.csi_actions)
           return true;
         }
     },
@@ -142,15 +195,36 @@ const actions = {
           return true;
         }
     },
-  async changeAgreement({ state, commit }, id){
-    let agreement = this.getters.agreement_Card(id)
-    // debugger
-    const res = await ax.put(`/agreement/${agreement.id}`, {agreement}).catch(function(err) { console.log(err)});
-    if(!res.err) {
-      return true;
-    }
-    return true
-  },
+    async saveCsiAction({state, commit}, data){
+      const res = await ax.post("/csi_actions", state.csi_action_data).catch(function(err) { console.log(err)});
+      if(!res.err) {
+        commit('appendNewCsiAction', res.data.payload)
+        return true;
+      }
+    },
+    async editCsiAction({ commit }, data){
+      const res = await ax.put("/csi_actions", data).catch(function(err) { console.log(err)});
+      if(!res.err) {
+        commit('editCsiAction', res.data.payload)
+        return true;
+      }
+    },
+    async deleteCsiAction({ commit }, id){
+      const res = await ax.delete(`/csi_actions/${id}`).catch(function(err) { console.log(err)});
+      if(!res.err) {
+        commit('deleteCsiAction', id)
+        return true;
+      }
+    },
+    async changeAgreement({ state, commit }, id){
+      let agreement = this.getters.agreement_Card(id)
+      // debugger
+      const res = await ax.put(`/agreement/${agreement.id}`, {agreement}).catch(function(err) { console.log(err)});
+      if(!res.err) {
+        return true;
+      }
+      return true
+    },
     // async changeProcType({state, commit}, id){
     //     let agreement = this.getters.agreement_Card(id)
     //     const res = await ax.put(`/agreement/${id}`, {agreement}).catch(function(err) { console.log(err)});

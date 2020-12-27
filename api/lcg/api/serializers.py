@@ -99,6 +99,15 @@ class AgreementSerialize(serializers.ModelSerializer):
         model = Agreement
         fields = '__all__'
 
+
+class CsiActionSerialize(serializers.ModelSerializer):
+    csi = RefCsiSerialize(many=False, read_only=True)
+
+    class Meta:
+        model = Csi_actions
+        fields = '__all__'
+
+
 class RefContactTypeSerilize(serializers.ModelSerializer):
     class Meta:
         model = Ref_contact_type
