@@ -11,4 +11,5 @@ urlpatterns = [
     path('get_ref', Ref.as_view()),
     path('csi_actions', CsiActions.as_view()),
     path('csi_actions/<int:id>', CsiActions.as_view()),
+    path('get-report', DownloadFile.as_view()),
 ]

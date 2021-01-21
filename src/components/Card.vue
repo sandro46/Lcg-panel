@@ -198,6 +198,14 @@
                                 <td>Номер исполнительного листа</td>
                                 <td>{{ agreement.ispol_doc_no }}</td>
                             </tr>
+                            <tr>
+                                <td>ЧСИ</td>
+                                <td>{{ agreement.csi ? agreement.csi.fio : 'Не назначен' }}</td>
+                            </tr>
+                            <tr>
+                                <td>Дата передачи ЧСИ</td>
+                                <td>{{ agreement.csi ? agreement.give_csi_dt : 'Не назначен' }}</td>
+                            </tr>
                         </tbody>
                     </template>
                 </v-simple-table>
@@ -601,17 +609,17 @@
                 this.contact_dialog = false
                 this.contact_load_overlay = false
             },
-            fetchData(){
-                this.$store.dispatch('getAgreementByID', this.$route.params.id)
-                this.$store.dispatch('getAgreementPaymentsByAgreementID', this.$route.params.id)
-                this.$store.dispatch('loadProcessTypes')
-                this.$store.dispatch('loadContactTypes')
-                this.$store.dispatch('loadCustomerPhoneTypes')
-                this.$store.dispatch('loadRefCsi')
-                this.$store.commit('setContactAgreement', this.$route.params.id)
-                this.$store.commit('setCsiActionAgreement', this.$route.params.id)
-                this.$store.dispatch('loadContactResults')
-                this.$store.dispatch('loadCustomerPhonesByAgreement', this.$route.params.id)
+            async fetchData(){
+                await this.$store.dispatch('getAgreementByID', this.$route.params.id)
+                await this.$store.dispatch('getAgreementPaymentsByAgreementID', this.$route.params.id)
+                await this.$store.dispatch('loadProcessTypes')
+                await this.$store.dispatch('loadContactTypes')
+                await this.$store.dispatch('loadCustomerPhoneTypes')
+                await this.$store.dispatch('loadRefCsi')
+                await this.$store.commit('setContactAgreement', this.$route.params.id)
+                await this.$store.commit('setCsiActionAgreement', this.$route.params.id)
+                await this.$store.dispatch('loadContactResults')
+                await this.$store.dispatch('loadCustomerPhonesByAgreement', this.$route.params.id)
             },
             openAgreement(id){
                 if(id == this.$route.params.id) return

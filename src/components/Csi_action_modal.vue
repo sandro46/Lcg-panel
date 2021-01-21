@@ -3,7 +3,7 @@
     <v-dialog v-model="csi_actions_dialog" persistent max-width="800px">
         <template v-slot:activator="{ on }">
 
-            <v-btn v-if="mode == 'addItem'" color="primary" dark class="mb-2" v-on="on">
+            <v-btn v-if="mode == 'addItem' && csi_action_data.csi" color="primary" dark class="mb-2" v-on="on">
                 <v-icon>mdi-plus</v-icon>
             </v-btn>     
             <v-icon v-if="mode == 'editItem'" small v-on="on">
@@ -14,7 +14,7 @@
         <v-card>
 
             <v-card-title>
-                <span class="headline">Добавить действие ЧСИ {{mode}}</span>
+                <span class="headline">Добавить действие ЧСИ</span>
             </v-card-title>
 
 
@@ -36,6 +36,7 @@
                                     item-value="id"
                                     v-model="csi_action_data.csi"
                                     dense
+                                    disabled
                                     label=""
                                     return-object
                                 >
@@ -94,51 +95,6 @@
                         </td>
                     </tr>
                     <tr>
-                        <td style="height: 70px;">
-                            <date-picker 
-                                v-model="csi_action_data.give_csi_dt"
-                                :lang="lang" 
-                                value-type="format" 
-                                format="DD.MM.YYYY">
-                            </date-picker>
-                        </td>
-                        <td style="height: 70px;">Дата передачи </td>
-                    </tr>
-                    <tr>
-                        <td style="height: 70px;">
-                            <date-picker 
-                                v-model="csi_action_data.recall_csi_dt" 
-                                :lang="lang" 
-                                value-type="format" 
-                                format="DD.MM.YYYY">
-                            </date-picker>
-                        </td>
-                        <td style="height: 70px;">Дата отзыва </td>
-                    </tr>
-                    <tr>
-                        <td style="height: 70px;">
-                            <date-picker 
-                                v-model="csi_action_data.stop_actions_csi_dt" 
-                                :lang="lang" 
-                                value-type="format" 
-                                format="DD.MM.YYYY">
-                            </date-picker>
-                        </td>
-                        <td style="height: 70px;">Дата приостановления действий </td>
-                    
-                    </tr>
-                    <tr>
-                        <td style="height: 70px;">
-                            <date-picker 
-                                v-model="csi_action_data.return_ispol_doc_dt" 
-                                :lang="lang" 
-                                value-type="format" 
-                                format="DD.MM.YYYY">
-                            </date-picker>
-                        </td>
-                        <td style="height: 70px;">Дата возврата испол. документа</td>
-                    </tr>
-                    <tr>
                         <td colspan="2">
                             <v-textarea
                                 v-model="csi_action_data.comment"
@@ -184,11 +140,9 @@
 
 <script>
 
-    import DatePicker from 'vue2-datepicker';
     import 'vue2-datepicker/index.css';
 
     export default {
-        components: { DatePicker },
         name: 'Csi_action_modal',
 
         props:{

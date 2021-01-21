@@ -10,13 +10,14 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
-import os
+import os, sys
 from dotenv import load_dotenv
 
 # Create .env file path.
 dotenv_path = os.path.join(os.path.dirname(__file__), '.env')
 # Load file from the path.
 load_dotenv(dotenv_path)
+
 
 # Accessing variables.
 os.environ["DB_HOST"] = os.getenv('DB_HOST')

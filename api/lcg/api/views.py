@@ -1,6 +1,7 @@
 import json, requests, time, re
 from datetime import datetime, timedelta
 from django.conf import settings
+from django.http import HttpResponse, HttpResponseNotFound
 # from snippets.serializers import SnippetSerializer
 from rest_framework.parsers import FileUploadParser
 from rest_framework.views import APIView
@@ -158,11 +159,6 @@ class CsiActions(APIView):
             arrest_of_property =request.data['arrest_of_property'],
             arrest_of_accounts =request.data['arrest_of_accounts'],
             arrest_of_deparure =request.data['arrest_of_deparure'],
-
-            give_csi_dt = datetime.strptime(request.data['give_csi_dt'], '%d.%m.%Y').strftime('%Y-%m-%d') if request.data['give_csi_dt'] else None,
-            recall_csi_dt = datetime.strptime(request.data['recall_csi_dt'], '%d.%m.%Y').strftime('%Y-%m-%d') if request.data['recall_csi_dt'] else None,
-            stop_actions_csi_dt = datetime.strptime(request.data['stop_actions_csi_dt'], '%d.%m.%Y').strftime('%Y-%m-%d') if request.data['stop_actions_csi_dt'] else None,
-            return_ispol_doc_dt = datetime.strptime(request.data['return_ispol_doc_dt'], '%d.%m.%Y').strftime('%Y-%m-%d') if request.data['return_ispol_doc_dt'] else None,
             
             comment=request.data['comment'] if request.data['comment'] else None,
         )
@@ -200,6 +196,15 @@ class CsiActions(APIView):
         Csi_actions.objects.filter(id=id).delete()
         return Response({"payload": 'OK'})
 
+class DownloadFile(APIView):
+    def get(self, request):
+        print(request.GET)
+        with open(TMP_DIR+request.GET['filename'], 'rb') as f:
+            file_data = f.read()
+        response = HttpResponse(file_data, content_type=request.GET['content_type'])
+        response['Content-Disposition'] = 'attachment; filename="{}"'.format(request.GET['filename'])
+        return response
+
 class LoaderCtl(APIView):
     parser_class = (FileUploadParser,)
 
@@ -236,13 +241,18 @@ class LoaderCtl(APIView):
                 res = up_court_costs(l.id)
             if(request.data['type'] == '6'):
                 res = up_finance(l.id)
+            if(request.data['type'] == '7'):
+                res = load_csi_actions(l.id)
             
             if l:
                 l.refresh_from_db()
                 data = LoaderSerialize(l).data
                 print('[i] Model data is ', data)
-                
-        return Response({"payload": data})
+        
+        if res.get('send_report', False):
+            return Response({"payload": res['send_report']})
+        else:
+            return Response({"payload": data})
 
 
 class Ref(APIView):

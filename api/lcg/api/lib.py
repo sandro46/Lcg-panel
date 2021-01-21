@@ -149,40 +149,6 @@ def create_phone_ifne(*, phone, type, customer: Customer):
        return ph
 
 
-def change_csi_by_agreement(l_id):
-       sheetName = 'Лист1'
-       data_xls = pd.read_excel(TMP_DIR+'temp_register.xlsx',
-                                sheetName, index_col=None, header=0, nrows=None, dtype=str)
-       l = Loader.objects.get(pk=l_id)
-       i = 0
-       loaded = 0
-       rejected = 0
-       for index, row in data_xls.iterrows():
-              row['Договор']
-              print('[i] Current row is ', row)
-              if pd.isnull(row['id ЧСИ']) or pd.isnull(row['Договор']):
-                     rejected += 1
-                     continue
-              a = Agreement.objects.filter(
-                  agreement_no=row['Договор']).first()
-              if not a:
-                     rejected += 1
-                     continue
-              с = Ref_csi.objects.filter(id=row['id ЧСИ']).first()
-              if not с:
-                  rejected += 1
-                  continue
-              a.csi = с
-              a.save()
-
-       l.status = Ref_load_status.objects.get(pk=2)
-       l.items_loaded = loaded
-       l.items_rejected = rejected
-       l.save()
-       return {
-           "status": True,
-           "rows_checked": i
-       }
        
 
 def add_payments(l_id):
@@ -372,6 +338,112 @@ def change_stage(l_id):
        return {
            "status": True,
            "rows_checked": i
+       }
+
+
+def change_csi_by_agreement(l_id):
+       sheetName = 'Лист1'
+       data_xls = pd.read_excel(TMP_DIR+'temp_register.xlsx',
+                               sheetName, index_col=None, header=0, nrows=None, dtype=str)
+       data_xls['Дата закрепления'] = pd.to_datetime(data_xls['Дата закрепления'])
+       data_xls['Дата отзыва'] = pd.to_datetime(data_xls['Дата отзыва'])
+       data_xls['Дата приостановления действий'] = pd.to_datetime(data_xls['Дата приостановления действий'])
+       data_xls['Дата возврата исполнительного листа'] = pd.to_datetime(data_xls['Дата возврата исполнительного листа'])
+       
+       l = Loader.objects.get(pk=l_id)
+       i = 0
+       loaded = 0
+       rejected = 0
+       for index, row in data_xls.iterrows():
+              
+              if pd.isnull(row['id ЧСИ']) or pd.isnull(row['Договор']):
+                     rejected += 1
+                     continue
+              a = Agreement.objects.filter(agreement_no=row['Договор']).first()
+              if not a:
+                     rejected += 1
+                     continue
+              с = Ref_csi.objects.filter(id=row['id ЧСИ']).first()
+              if not с:
+                  rejected += 1
+                  continue
+              a.csi = с
+
+              a.give_csi_dt=row['Дата закрепления'] if pd.notnull(row['Дата закрепления']) else None
+              a.recall_csi_dt=row['Дата отзыва'] if pd.notnull(row['Дата отзыва']) else None
+              a.stop_actions_csi_dt=row['Дата приостановления действий'] if pd.notnull(row['Дата приостановления действий']) else None
+              a.return_ispol_doc_dt = row['Дата возврата исполнительного листа'] if pd.notnull(row['Дата возврата исполнительного листа']) else None
+
+              a.save()
+
+       l.status = Ref_load_status.objects.get(pk=2)
+       l.items_loaded = loaded
+       l.items_rejected = rejected
+       l.save()
+       return {
+           "status": True,
+           "rows_checked": i
+       }
+
+def load_csi_actions(l_id):
+       data_xls = pd.read_excel(TMP_DIR+'temp_register.xlsx', index_col=None, header=0, nrows=None)
+       data_xls['Дата'] = pd.to_datetime(data_xls['Дата'])
+       data_xls['Status'] = 'OK'
+
+       l = Loader.objects.get(pk=l_id)
+       i = 0
+       loaded = 0
+       rejected = 0
+       for index, row in data_xls.iterrows():
+              i += 1
+              print('[i][load_csi_actions] Current row is ', row)
+              if pd.isnull(row['Договор']):
+                     data_xls['Status'][index] = 'Error: Нет договора'
+                     rejected+=1
+                     continue
+              a = Agreement.objects.filter(agreement_no=row['Договор']).first()
+              if not a:
+                     data_xls['Status'][index] = 'Error: Не найден договор'
+                     rejected += 1
+                     continue
+              if not a.csi:
+                     data_xls['Status'][index] = 'Error: За делом не закреплён ЧСИ'
+                     rejected += 1
+                     continue
+
+              obj = Csi_actions(
+                     agreement=a,
+                     csi=a.csi,
+
+                     arrest_of_salary=('Y' if row['Арест ЗП/Пенсии']=='Y' else 'N'),
+                     arrest_of_property=('Y' if row['Арест имущества']=='Y' else 'N'),
+                     arrest_of_accounts=('Y' if row['Арест счета']=='Y' else 'N'),
+                     arrest_of_deparure=('Y' if row['Ограничение выезда']=='Y' else 'N'),
+
+                     created=row['Дата'],
+
+                     comment=row['КОМЕНТАРИИ'] if row['КОМЕНТАРИИ'] else None,
+              )
+              obj.save()
+
+       l.status = Ref_load_status.objects.get(pk=2)
+       l.items_loaded = loaded
+       l.items_rejected = rejected
+       l.save()
+
+       report_file_name = 'result_csi_actions.xlsx'
+       report_file_path = TMP_DIR + report_file_name
+
+       with pd.ExcelWriter(report_file_path, mode='w') as writer:
+              data_xls.to_excel(writer, index=False)
+
+       return {
+           "status": True,
+           "rows_checked": i,
+           "send_report": {
+              'content_type': 'application/vnd.ms-excel',
+              'filename': report_file_name
+           }
        }
 
 

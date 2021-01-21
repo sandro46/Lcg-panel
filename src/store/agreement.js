@@ -30,10 +30,6 @@ const state = {
       arrest_of_property: 'N',
       arrest_of_accounts: 'N',
       arrest_of_deparure: 'N',
-      give_csi_dt: '',
-      recall_csi_dt: '',
-      stop_actions_csi_dt: '',
-      return_ispol_doc_dt: '',
       comment: ''
     },
     payments: [],
@@ -88,7 +84,6 @@ const mutations = {
         this.commit("loading", false)
     },
     addAgreement(state, payload){
-      // debugger
       let a = payload[0]
       let i = state.items.findIndex(agreement => agreement.id === a.id)
       if (i > -1) {
@@ -110,7 +105,11 @@ const mutations = {
       state.contactData.agreement_id = id
     },
     setCsiActionAgreement(state, id){
+      // debugger
+      let i = state.items.findIndex((agreement) => {return agreement.id == id})
+      if (i === -1) return false
       state.csi_action_data.agreement_id = id
+      state.csi_action_data.csi = state.items[i]['csi']
     },
     setContacts(state, payload){
       state.contacts = payload
@@ -128,7 +127,7 @@ const mutations = {
       state.contactData.installment_dt_to = ''
     },
     appendNewCsiAction(state, payload){
-      state.csi_actions.push(payload)
+      state.csi_actions.unshift(payload)
 
       state.csi_action_data.csi = {}
       state.csi_action_data.arrest_of_salary = 'N'
@@ -172,7 +171,6 @@ const actions = {
     },
     async getAgreementByID({commit}, id){
         const res = await ax.get(`/agreement/${id}`).catch(function(err) { console.log(err)});
-        // debugger;
         if(!res.err) {
           commit('addAgreement', res.data.payload)
           commit('setContacts', res.data.contacts)
@@ -189,7 +187,6 @@ const actions = {
     },
     async saveContactData({state, commit}){
         const res = await ax.post("/contact", state.contactData).catch(function(err) { console.log(err)});
-        // debugger;
         if(!res.err) {
           commit('appendNewContact', res.data.payload)
           return true;

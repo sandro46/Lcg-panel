@@ -110,15 +110,18 @@ class Agreement(models.Model):
     csi = models.ForeignKey(Ref_csi, on_delete=models.CASCADE, null=True)
     ispol_date = models.DateField(null=True)
     ispol_doc_no = models.CharField(max_length=20, null=True)
+    
     arrest_of_salary = models.CharField(max_length=1, default='N')
     arrest_of_property = models.CharField(max_length=1, default='N')
     arrest_of_accounts = models.CharField(max_length=1, default='N')
     arrest_of_deparure = models.CharField(max_length=1, default='N')
+
     created = models.DateField(auto_now_add=True)
     notary_id = models.IntegerField(null=True)
     nadpis_doc_no = models.CharField(max_length=100, null=True)
     nadpis_initial_date = models.DateField(null=True)
     nadpis_start_date = models.DateField(null=True)
+
     give_csi_dt = models.DateField(null=True)
     recall_csi_dt = models.DateField(null=True)
     stop_actions_csi_dt = models.DateField(null=True)
@@ -139,11 +142,6 @@ class Csi_actions(models.Model):
     arrest_of_property = models.CharField(max_length=1, default='N')
     arrest_of_accounts = models.CharField(max_length=1, default='N')
     arrest_of_deparure = models.CharField(max_length=1, default='N')
-
-    give_csi_dt = models.DateField(null=True)
-    recall_csi_dt = models.DateField(null=True)
-    stop_actions_csi_dt = models.DateField(null=True)
-    return_ispol_doc_dt = models.DateField(null=True)
     
     comment = models.TextField(null=True)
 
